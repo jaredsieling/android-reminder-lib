@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- body content -->
+    <dimen name="gutter">10dp</dimen>
+    <dimen name="halfgutter">5dp</dimen>
+    <dimen name="gutter_thin">3dp</dimen>
+    <dimen name="button_padding">8.0dip</dimen>
+
+    <!-- Map Padding -->
+    <dimen name="map_marker_gutter">70dp</dimen>
+
+</resources>

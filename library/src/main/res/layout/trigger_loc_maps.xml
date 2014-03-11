@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/trigger_maps_container"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:padding="@dimen/halfgutter" >
+
+        <Button
+            android:id="@+id/button_maps_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/gutter"
+            android:text="@android:string/ok" />
+
+        <TextView
+            android:id="@+id/text_maps_header"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/button_maps_done"
+            android:gravity="center_vertical"
+            android:maxLines="3" />
+    </RelativeLayout>
+
+    <fragment
+        android:id="@+id/triggers_map"
+        android:name="org.ohmage.reminders.base.TouchableSupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

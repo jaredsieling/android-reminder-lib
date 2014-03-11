@@ -1,10 +1,113 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.ohmage.reminders">
 
-    <application android:allowBackup="true"
-        android:label="@string/app_name"
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+
+    <application
+        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
->
+        android:label="@string/app_name">
+
+        <!--<receiver android:name="org.ohmage.service.TriggerReceiver" >-->
+        <!--<intent-filter>-->
+        <!--<action android:name="org.ohmage.reminders.SURVEY_LIST_CHANGED" />-->
+        <!--</intent-filter>-->
+        <!--</receiver>-->
+
+        <activity
+            android:name="org.ohmage.reminders.ui.TriggerListActivity"
+            android:label="@string/triggers_title" />
+
+        <!-- Lock the orientation until the TimePicker rotate bug is fixed -->
+        <activity
+            android:name="org.ohmage.reminders.types.time.TimeTrigEditActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name="org.ohmage.reminders.notif.NotifEditActivity" />
+        <activity android:name="org.ohmage.reminders.notif.NotifSettingsActivity" />
+
+        <!-- Lock the orientation until the TimePicker rotate bug is fixed -->
+        <activity
+            android:name="org.ohmage.reminders.types.location.LocTrigEditActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name="org.ohmage.reminders.types.location.LocTrigSettingsActivity" />
+        <activity android:name="org.ohmage.reminders.types.location.LocTrigTracingSettActivity" />
+        <activity
+            android:name="org.ohmage.reminders.types.location.LocTrigMapsActivity"
+            android:screenOrientation="portrait" />
+
+        <receiver android:name="org.ohmage.reminders.base.TriggerTimeReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="org.ohmage.reminders.types.time.TimeTrigService" />
+
+        <receiver android:name="org.ohmage.reminders.types.time.TimeTrigService$AlarmReceiver">
+            <intent-filter>
+                <action android:name="edu.ucla.cens.triggers.types.time.TimeTriggerAlarm" />
+
+                <data android:scheme="timetrigger" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="org.ohmage.reminders.types.location.LocTrigService" />
+
+        <receiver android:name="org.ohmage.reminders.types.location.LocTrigService$AlarmReceiver">
+            <intent-filter>
+                <action android:name="org.ohmage.reminders.types.location.LocTrigService.TRIGGER_ALWAYS" />
+
+                <data android:scheme="locationtrigger" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.ohmage.reminders.types.location.LocTrigService.KEEP_ALIVE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.ohmage.reminders.types.location.LocTrigService.GPS_TIMEOUT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.ohmage.reminders.types.location.LocTrigService.GPS_SAMPLE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.ohmage.reminders.types.location.LocTrigService.PASS_THROUGH" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="org.ohmage.reminders.notif.Notifier$NotifReceiver">
+            <intent-filter>
+                <action android:name="edu.ucla.cens.triggers.notif.Notifier.expire_notif" />
+
+                <data android:scheme="notifier" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="edu.ucla.cens.triggers.notif.Notifier.repeat_notif" />
+
+                <data android:scheme="notifier" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="edu.ucla.cens.triggers.notif.Notifier.notification_deleted" />
+
+                <data android:scheme="notifier" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="edu.ucla.cens.triggers.notif.Notifier.notification_clicked" />
+
+                <data android:scheme="notifier" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyAEkUH1FVkCDrETFD-o7xMJ_WpzeHoFOvQ" />
+
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 
     </application>
 

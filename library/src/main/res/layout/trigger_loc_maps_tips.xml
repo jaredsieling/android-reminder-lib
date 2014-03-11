@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/check_do_not_show"
+        android:layout_alignParentTop="true" />
+
+    <CheckBox
+        android:id="@+id/check_do_not_show"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_close"
+        android:text="@string/trigger_loc_map_tips_hide" />
+
+    <Button
+        android:id="@+id/button_close"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dip"
+        android:text="@android:string/ok" />
+
+</RelativeLayout>

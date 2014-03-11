@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="wifigpslocation-1.0-20140227.202044-1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/library/build/exploded-aar/org.ohmage/wifigpslocation/1.0-SNAPSHOT/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/library/build/exploded-aar/org.ohmage/wifigpslocation/1.0-SNAPSHOT/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
