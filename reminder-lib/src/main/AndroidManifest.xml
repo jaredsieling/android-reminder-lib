@@ -21,7 +21,11 @@
 
         <activity
             android:name="org.ohmage.reminders.ui.TriggerListActivity"
-            android:label="@string/triggers_title" />
+            android:label="@string/triggers_title" >
+            <intent-filter>
+                <action android:name="org.ohmage.reminders.VIEW_REMINDERS" />
+            </intent-filter>
+        </activity>
 
         <!-- Lock the orientation until the TimePicker rotate bug is fixed -->
         <activity

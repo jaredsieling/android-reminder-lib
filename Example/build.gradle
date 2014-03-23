@@ -20,6 +20,6 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:+'
-    compile project(':library')
+    compile project(':reminder-lib')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

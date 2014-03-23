@@ -1,1 +1,1 @@
-include ':library', ':Example'
+include ':Example', 'reminder-lib'

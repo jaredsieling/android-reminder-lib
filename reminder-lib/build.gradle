@@ -24,3 +24,19 @@ dependencies {
     compile 'org.ohmage:wifigpslocation:1.0-SNAPSHOT'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+
+            pom.project {
+                name 'ReminderLib'
+                packaging 'aar'
+            }
+        }
+    }
+}
