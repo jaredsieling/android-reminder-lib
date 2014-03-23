@@ -20,8 +20,8 @@ android {
 
 dependencies {
     compile 'com.google.android.gms:play-services:4.2.+'
-    compile 'org.ohmage:accelservice:1.0-SNAPSHOT'
-    compile 'org.ohmage:wifigpslocation:1.0-SNAPSHOT'
+    compile 'org.ohmage:accelservice:3.0'
+    compile 'org.ohmage:wifigpslocation:3.15'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
