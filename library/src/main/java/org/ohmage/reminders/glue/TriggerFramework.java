@@ -61,8 +61,8 @@ public class TriggerFramework {
 	public static Intent launchTriggersIntent(Context context, String campaignUrn, String[] surveys ) {
 		
 		Intent i = new Intent(context, TriggerListActivity.class);
-		i.putExtra(TriggerListActivity.KEY_CAMPAIGN_URN, campaignUrn);
-		i.putExtra(TriggerListActivity.KEY_ACTIONS, surveys);
+		i.putExtra(TriggerListActivity.EXTRA_CAMPAIGN_URN, campaignUrn);
+		i.putExtra(TriggerListActivity.EXTRA_ACTIONS, surveys);
 		return i;
 	}
 	

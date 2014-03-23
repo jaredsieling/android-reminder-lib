@@ -95,8 +95,8 @@ public class TimeTrigEditActivity extends PreferenceActivity implements View.OnC
         mTrigDesc = new TimeTrigDesc();
         mActDesc = new TriggerActionDesc();
 
-        if (getIntent().hasExtra(TriggerListActivity.KEY_ACTIONS)) {
-            mActions = getIntent().getStringArrayExtra(TriggerListActivity.KEY_ACTIONS);
+        if (getIntent().hasExtra(TriggerListActivity.EXTRA_ACTIONS)) {
+            mActions = getIntent().getStringArrayExtra(TriggerListActivity.EXTRA_ACTIONS);
         } else {
             Log.e(TAG, "TimeTrigEditActivity: Invoked with out passing surveys");
             finish();

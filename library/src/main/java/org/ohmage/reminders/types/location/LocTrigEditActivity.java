@@ -106,8 +106,8 @@ public class LocTrigEditActivity extends PreferenceActivity implements OnPrefere
         mTrigDesc = new LocTrigDesc();
         mActDesc = new TriggerActionDesc();
 
-        if (getIntent().hasExtra(TriggerListActivity.KEY_ACTIONS)) {
-            mActions = getIntent().getStringArrayExtra(TriggerListActivity.KEY_ACTIONS);
+        if (getIntent().hasExtra(TriggerListActivity.EXTRA_ACTIONS)) {
+            mActions = getIntent().getStringArrayExtra(TriggerListActivity.EXTRA_ACTIONS);
         } else {
             Log.e(TAG, "LocTrigEditActivity: Invoked with out passing surveys");
             finish();

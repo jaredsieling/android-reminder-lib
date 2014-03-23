@@ -57,11 +57,11 @@ public class TriggerListActivity extends ListActivity {
 
     private static final String PREF_FILE_NAME = TriggerListActivity.class.getName();
 
-    public static final String KEY_CAMPAIGN_URN = TriggerListActivity.class.getName()
+    public static final String EXTRA_CAMPAIGN_URN = TriggerListActivity.class.getName()
             + ".campain_urn";
-    public static final String KEY_CAMPAIGN_NAME = TriggerListActivity.class.getName()
+    public static final String EXTRA_NAME = TriggerListActivity.class.getName()
             + ".campain_name";
-    public static final String KEY_ACTIONS = TriggerListActivity.class.getName() + ".actions";
+    public static final String EXTRA_ACTIONS = TriggerListActivity.class.getName() + ".actions";
     // pass survey names through here to preselect them in the trigger creation
     // page
     public static final String KEY_PRESELECTED_ACTIONS = TriggerListActivity.class.getName()
@@ -113,8 +113,8 @@ public class TriggerListActivity extends ListActivity {
         mTrigMap = new TriggerTypeMap();
 
         Intent i = getIntent();
-        if (i.hasExtra(KEY_ACTIONS)) {
-            mActions = i.getStringArrayExtra(KEY_ACTIONS);
+        if (i.hasExtra(EXTRA_ACTIONS)) {
+            mActions = i.getStringArrayExtra(EXTRA_ACTIONS);
         } else {
             Log.e(TAG, "TriggerListActivity: Invoked with out passing surveys");
             finish();
@@ -128,16 +128,16 @@ public class TriggerListActivity extends ListActivity {
             mPreselectedActions = i.getStringArrayExtra(KEY_PRESELECTED_ACTIONS);
         }
 
-        if (i.hasExtra(KEY_CAMPAIGN_URN)) {
-            mCampaignUrn = i.getStringExtra(KEY_CAMPAIGN_URN);
+        if (i.hasExtra(EXTRA_CAMPAIGN_URN)) {
+            mCampaignUrn = i.getStringExtra(EXTRA_CAMPAIGN_URN);
         } else {
             Log.e(TAG, "TriggerListActivity: Invoked with out passing campaign urn");
             finish();
             return;
         }
 
-        if (i.hasExtra(KEY_CAMPAIGN_NAME)) {
-            mCampaignName = i.getStringExtra(KEY_CAMPAIGN_NAME);
+        if (i.hasExtra(EXTRA_NAME)) {
+            mCampaignName = i.getStringExtra(EXTRA_NAME);
         } else {
             Log.e(TAG, "TriggerListActivity: Invoked with out passing campaign name");
             finish();

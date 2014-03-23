@@ -21,12 +21,12 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getBaseContext(),TriggerListActivity.class);
-                intent.putExtra(TriggerListActivity.KEY_CAMPAIGN_URN, "campaign_urn");
-                intent.putExtra(TriggerListActivity.KEY_CAMPAIGN_NAME, "campaign_name");
+                intent.putExtra(TriggerListActivity.EXTRA_CAMPAIGN_URN, "campaign_urn");
+                intent.putExtra(TriggerListActivity.EXTRA_NAME, "campaign_name");
                 String[] actions = new String[2];
                 actions[0] = "Action 1";
                 actions[1] = "Action 1";
-                intent.putExtra(TriggerListActivity.KEY_ACTIONS, actions);
+                intent.putExtra(TriggerListActivity.EXTRA_ACTIONS, actions);
                 startActivity(intent);
             }
         });

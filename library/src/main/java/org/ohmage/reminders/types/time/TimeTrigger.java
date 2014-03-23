@@ -91,7 +91,7 @@ public class TimeTrigger extends TriggerBase {
 		});
 		
 		Intent i = new Intent(context, TimeTrigEditActivity.class);
-		i.putExtra(TriggerListActivity.KEY_ACTIONS, actions);
+		i.putExtra(TriggerListActivity.EXTRA_ACTIONS, actions);
 		if (preselectedActions != null)
 			i.putExtra(TriggerListActivity.KEY_PRESELECTED_ACTIONS, preselectedActions);
 		i.putExtra(TimeTrigEditActivity.KEY_ADMIN_MODE, adminMode);
@@ -119,7 +119,7 @@ public class TimeTrigger extends TriggerBase {
 		i.putExtra(TimeTrigEditActivity.KEY_TRIG_DESC, trigDesc);
 		i.putExtra(TimeTrigEditActivity.KEY_ACT_DESC, actDesc);
 		i.putExtra(TimeTrigEditActivity.KEY_ADMIN_MODE, adminMode);
-		i.putExtra(TriggerListActivity.KEY_ACTIONS, mActions);
+		i.putExtra(TriggerListActivity.EXTRA_ACTIONS, mActions);
 		context.startActivity(i);
 	}
 

@@ -136,7 +136,7 @@ public class LocationTrigger extends TriggerBase {
 		
 		Intent i = new Intent(context, LocTrigEditActivity.class);
 		i.putExtra(LocTrigEditActivity.KEY_ADMIN_MODE, adminMode);
-		i.putExtra(TriggerListActivity.KEY_ACTIONS, actions);
+		i.putExtra(TriggerListActivity.EXTRA_ACTIONS, actions);
 		if (preselectedActions != null)
 			i.putExtra(TriggerListActivity.KEY_PRESELECTED_ACTIONS, preselectedActions);
 		context.startActivity(i);
@@ -180,7 +180,7 @@ public class LocationTrigger extends TriggerBase {
 		i.putExtra(LocTrigEditActivity.KEY_TRIG_DESC, trigDesc);
 		i.putExtra(LocTrigEditActivity.KEY_ACT_DESC, actDesc);
 		i.putExtra(LocTrigEditActivity.KEY_ADMIN_MODE, adminMode);
-		i.putExtra(TriggerListActivity.KEY_ACTIONS, mActions);
+		i.putExtra(TriggerListActivity.EXTRA_ACTIONS, mActions);
 		context.startActivity(i);	
 	}
 
