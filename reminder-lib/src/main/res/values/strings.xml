@@ -9,4 +9,7 @@
         <item quantity="one">There is a survey to take.</item>
         <item quantity="other">There are surveys to take.</item>
     </plurals>
+    <string name="ignore">Ignore</string>
+    <string name="snooze">Snooze</string>
+    <string name="notification_snoozed">Reminder snoozed for 10 minutes</string>
 </resources>

@@ -55,6 +55,12 @@ public abstract class TriggerBase {
     public void notifyTrigger(Context context, int trigId) {
         Log.v(TAG, "TriggerBase: notifyTrigger(" + trigId + ")");
 
+        // Clear the ignored state for all of this trigger's surveys
+        Set<String> surveys = NotifSurveyAdaptor.getSurveysForTrigger(context, trigId);
+        for (String survey : surveys) {
+            NotifSurveyAdaptor.clearSurveyIgnored(context, survey);
+        }
+
         TriggerDB db = new TriggerDB(context);
         db.open();
 

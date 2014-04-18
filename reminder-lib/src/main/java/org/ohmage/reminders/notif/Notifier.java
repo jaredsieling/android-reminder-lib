@@ -76,6 +76,12 @@ public class Notifier {
             "edu.ucla.cens.triggers.notif.Notifier.notification_clicked";
     private static final String ACTION_NOTIF_DELETED =
             "edu.ucla.cens.triggers.notif.Notifier.notification_deleted";
+    private static final String ACTION_NOTIF_IGNORED =
+            "edu.ucla.cens.triggers.notif.Notifier.notification_ignored";
+    private static final String ACTION_NOTIF_SNOOZED =
+            "edu.ucla.cens.triggers.notif.Notifier.notification_snoozed";
+    private static final String ACTION_NOTIF_RESHOW =
+            "edu.ucla.cens.triggers.notif.Notifier.notification_end_snooze";
     private static final String ACTION_EXPIRE_ALM =
             "edu.ucla.cens.triggers.notif.Notifier.expire_notif";
     private static final String ACTION_REPEAT_ALM =
@@ -148,6 +154,17 @@ public class Notifier {
         }
 
         if (surveys.size() == 1) {
+            Intent ignoreIntent = new Intent(context, NotifReceiver.class)
+                    .setAction(ACTION_NOTIF_IGNORED).putExtra(EXTRA_SURVEYS, surveys);
+            PendingIntent piIgnore = PendingIntent.getBroadcast(context, 0, ignoreIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            Intent snoozeIntent = new Intent(context, NotifReceiver.class)
+                    .setAction(ACTION_NOTIF_SNOOZED);
+            PendingIntent piSnooze = PendingIntent.getBroadcast(context, 0, snoozeIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            builder.addAction(R.drawable.stat_notify_alarm, context.getString(R.string.snooze), piSnooze)
+                    .addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(R.string.ignore), piIgnore);
+
             // Get the survey name
             Cursor cursor = context.getContentResolver().query(Reminders.buildRemindersUri(),
                     new String[]{Reminders.REMINDER_NAME}, Reminders._ID + "=?",
@@ -526,6 +543,21 @@ public class Notifier {
             if (intent.getAction().equals(ACTION_NOTIF_CLICKED)) {
                 ArrayList<String> surveys = intent.getStringArrayListExtra(EXTRA_SURVEYS);
                 Notifier.handleNotifClicked(context, surveys);
+            } else if (intent.getAction().equals(ACTION_NOTIF_IGNORED)) {
+                hideNotification(context);
+                // Set the surveys for this trigger to be ignored
+                ArrayList<String> surveys = intent.getStringArrayListExtra(EXTRA_SURVEYS);
+                for (String survey : surveys) {
+                    NotifSurveyAdaptor.recordSurveyIgnored(context, survey);
+                }
+                TriggerBase.updatePendingStateForSurveys(context, Reminders.NOT_PENDING,
+                        surveys.toArray(new String[]{}));
+            } else if (intent.getAction().equals(ACTION_NOTIF_SNOOZED)) {
+                Toast.makeText(context, R.string.notification_snoozed, Toast.LENGTH_SHORT).show();
+                hideNotification(context);
+                setAlarm(context, ACTION_NOTIF_RESHOW, 10, null);
+            } else if (intent.getAction().equals(ACTION_NOTIF_RESHOW)) {
+                refreshNotification(context, false);
             } else if (intent.getAction().equals(ACTION_NOTIF_DELETED)) {
                 Notifier.handleNotifDeleted(context);
             } else if (intent.getAction().equals(ACTION_EXPIRE_ALM)) {

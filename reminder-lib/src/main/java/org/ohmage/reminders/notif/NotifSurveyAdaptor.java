@@ -132,7 +132,7 @@ public class NotifSurveyAdaptor {
 
                 //Has the survey been taken in within the
                 //suppression window?
-                if (IsSurveyTaken(context, surveys[i], trigTS - suppressMS)) {
+                if (IsSurveyTakenOrIgnored(context, surveys[i], System.currentTimeMillis() - suppressMS)) {
                     continue;
                 }
 
@@ -172,7 +172,7 @@ public class NotifSurveyAdaptor {
      * by the user since a given time. This function checks
      * the time stamp of the survey stored in shared preferences.
      */
-    private static boolean IsSurveyTaken(Context context,
+    private static boolean IsSurveyTakenOrIgnored(Context context,
                                                   String survey,
                                                   long since) {
 
@@ -180,15 +180,8 @@ public class NotifSurveyAdaptor {
                 NotifSurveyAdaptor.class.getName(),
                 Context.MODE_PRIVATE);
 
-        if (!pref.contains(survey)) {
-            return false;
-        }
-
-        if (pref.getLong(survey, 0) <= since) {
-            return false;
-        }
-
-        return true;
+        return (pref.contains(survey) && pref.getLong(survey, 0) > since)
+                || (pref.contains(survey + "_ignored") && pref.getLong(survey + "_ignored", 0) > since);
     }
 
     /*
@@ -269,6 +262,39 @@ public class NotifSurveyAdaptor {
 
         SharedPreferences.Editor editor = pref.edit();
         editor.putLong(survey, System.currentTimeMillis());
+        editor.commit();
+
+        TrigPrefManager.registerPreferenceFile(context, NotifSurveyAdaptor.class.getName());
+    }
+
+    /*
+     * Saves the fact that a survey was ignored by a user
+     */
+    public static void recordSurveyIgnored(Context context, String survey) {
+
+        SharedPreferences pref = context.getSharedPreferences(
+                NotifSurveyAdaptor.class.getName(),
+                Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putLong(survey + "_ignored", System.currentTimeMillis());
+        editor.commit();
+
+        TrigPrefManager.registerPreferenceFile(context, NotifSurveyAdaptor.class.getName());
+    }
+
+    /*
+     * Removes the ignored state of a survey. This should happen when a reminder for a survey goes
+     * off
+     */
+    public static void clearSurveyIgnored(Context context, String survey) {
+
+        SharedPreferences pref = context.getSharedPreferences(
+                NotifSurveyAdaptor.class.getName(),
+                Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.remove(survey + "_ignored");
         editor.commit();
 
         TrigPrefManager.registerPreferenceFile(context, NotifSurveyAdaptor.class.getName());
@@ -391,7 +417,7 @@ public class NotifSurveyAdaptor {
         LinkedList<String> untakenList = new LinkedList<String>();
         for (String survey : actDesc.getSurveys()) {
 
-            if (!IsSurveyTaken(context, survey, rtDesc.getTriggerTimeStamp())) {
+            if (!IsSurveyTakenOrIgnored(context, survey, rtDesc.getTriggerTimeStamp())) {
 
                 untakenList.add(survey);
             }
