@@ -6,5 +6,7 @@
     <string name="show_specific_reminders">Show Specific Reminders</string>
     <string name="show_group_reminders">Show Group Reminders</string>
     <string name="action_settings">Settings</string>
+    <string name="set_survey_taken">Set Survey #0 taken</string>
+    <string name="clear_survey_taken">Clear Survey #0 taken state</string>
 
 </resources>

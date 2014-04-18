@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import org.ohmage.reminders.glue.TriggerFramework;
+import org.ohmage.reminders.notif.NotifSurveyAdaptor;
 import org.ohmage.reminders.ui.TriggerListActivity;
 
 import java.util.Arrays;
@@ -52,6 +53,24 @@ public class MainActivity extends ActionBarActivity {
                 intent.putExtra(TriggerListActivity.EXTRA_CAMPAIGN_URN, "group_id");
                 intent.putExtra(TriggerListActivity.EXTRA_NAME, "Group Name");
                 startActivity(intent);
+            }
+        });
+
+        findViewById(R.id.set_survey_taken).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Survey #0 set as taken");
+                TriggerFramework.notifySurveyTaken(getBaseContext(), "0");
+            }
+        });
+
+        findViewById(R.id.clear_survey_taken).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Survey #0 set as not taken");
+                // This function should not be used by client under normal circumstances. It is only
+                // used here to facilitate testing.
+                NotifSurveyAdaptor.clearSurveyTaken(getBaseContext(), "0");
             }
         });
     }

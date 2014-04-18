@@ -267,6 +267,14 @@ public class NotifSurveyAdaptor {
         TrigPrefManager.registerPreferenceFile(context, NotifSurveyAdaptor.class.getName());
     }
 
+    public static void clearSurveyTaken(Context context, String survey) {
+        SharedPreferences pref = context.getSharedPreferences(
+                NotifSurveyAdaptor.class.getName(),
+                Context.MODE_PRIVATE);
+        pref.edit().remove(survey).commit();
+        TrigPrefManager.registerPreferenceFile(context, NotifSurveyAdaptor.class.getName());
+    }
+
     /*
      * Saves the fact that a survey was ignored by a user
      */
