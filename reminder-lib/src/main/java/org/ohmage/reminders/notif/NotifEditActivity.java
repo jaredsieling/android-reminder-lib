@@ -388,6 +388,7 @@ public class NotifEditActivity extends ListActivity implements OnClickListener {
                 mNotifDesc.setRepeats(new ArrayList<Integer>());
             }
             Intent intent = new Intent();
+            intent.setPackage(getPackageName());
             intent.putExtra(KEY_NOTIF_CONFIG, mNotifDesc.toString());
             setResult(0, intent);
             finish();

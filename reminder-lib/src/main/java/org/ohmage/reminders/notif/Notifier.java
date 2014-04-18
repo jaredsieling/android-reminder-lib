@@ -144,12 +144,12 @@ public class Notifier {
 
         //Watch for notification cleared events
         notif.deleteIntent = PendingIntent.getBroadcast(context, 0,
-                new Intent(ACTION_NOTIF_DELETED).putExtra(KEY_CAMPAIGN_URN, campaignUrn).putExtra(KEY_CAMPAIGN_NAME, title).setData(Uri.parse(DATA_PREFIX_ALM + campaignUrn)),
+                new Intent(ACTION_NOTIF_DELETED).setPackage(context.getPackageName()).putExtra(KEY_CAMPAIGN_URN, campaignUrn).putExtra(KEY_CAMPAIGN_NAME, title).setData(Uri.parse(DATA_PREFIX_ALM + campaignUrn)),
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
         //Watch for notification clicked events
         PendingIntent pi = PendingIntent.getBroadcast(context, 0,
-                new Intent(ACTION_NOTIF_CLICKED).putExtra(KEY_CAMPAIGN_URN, campaignUrn).putExtra(KEY_CAMPAIGN_NAME, title).setData(Uri.parse(DATA_PREFIX_ALM + campaignUrn)),
+                new Intent(ACTION_NOTIF_CLICKED).setPackage(context.getPackageName()).putExtra(KEY_CAMPAIGN_URN, campaignUrn).putExtra(KEY_CAMPAIGN_NAME, title).setData(Uri.parse(DATA_PREFIX_ALM + campaignUrn)),
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
         notif.setLatestEventInfo(context, title, summary, pi);
@@ -210,11 +210,12 @@ public class Notifier {
 
         //Send the broadcast indicating a change in the notification survey
         //list
-        context.sendBroadcast(new Intent(ACTION_ACTIVE_SURVEY_LIST_CHANGED).putExtra(KEY_CAMPAIGN_URN, campaignUrn));
+        context.sendBroadcast(new Intent(ACTION_ACTIVE_SURVEY_LIST_CHANGED).setPackage(context.getPackageName()).putExtra(KEY_CAMPAIGN_URN, campaignUrn));
     }
 
-    private static Intent getAlarmIntent(String action, int trigId) {
+    private static Intent getAlarmIntent(Context context, String action, int trigId) {
         Intent i = new Intent(action);
+        i.setPackage(context.getPackageName());
         i.setData(Uri.parse(DATA_PREFIX_ALM + trigId));
         i.putExtra(KEY_TRIGGER_ID, trigId);
         return i;
@@ -224,7 +225,7 @@ public class Notifier {
         AlarmManager alarmMan = (AlarmManager) context.getSystemService(
                 Context.ALARM_SERVICE);
 
-        Intent i = getAlarmIntent(ACTION_EXPIRE_ALM, trigId);
+        Intent i = getAlarmIntent(context, ACTION_EXPIRE_ALM, trigId);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,
                 PendingIntent.FLAG_NO_CREATE);
 
@@ -233,7 +234,7 @@ public class Notifier {
             pi.cancel();
         }
 
-        i = getAlarmIntent(ACTION_REPEAT_ALM, trigId);
+        i = getAlarmIntent(context, ACTION_REPEAT_ALM, trigId);
         pi = PendingIntent.getBroadcast(context, 0, i,
                 PendingIntent.FLAG_NO_CREATE);
 
@@ -255,7 +256,7 @@ public class Notifier {
         AlarmManager alarmMan = (AlarmManager)
                 context.getSystemService(Context.ALARM_SERVICE);
 
-        Intent i = getAlarmIntent(action, trigId);
+        Intent i = getAlarmIntent(context, action, trigId);
         if (extras != null) {
             i.putExtras(extras);
         }
@@ -436,6 +437,7 @@ public class Notifier {
 
         //Broadcast to Ohmage
         Intent i = new Intent(ACTION_TRIGGER_NOTIFICATION);
+        i.setPackage(context.getPackageName());
         i.putExtra(KEY_CAMPAIGN_URN, campaignUrn);
         context.sendBroadcast(i);
     }

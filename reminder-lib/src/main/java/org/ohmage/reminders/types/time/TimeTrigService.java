@@ -147,8 +147,8 @@ public class TimeTrigService extends Service {
 
     private Intent createAlarmIntent(int trigId, String trigDesc) {
         Intent i = new Intent();
-
         i.setAction(ACTION_TRIG_ALM);
+        i.setPackage(getPackageName());
         i.setData(Uri.parse(DATA_PREFIX_TRIG_ALM + trigId));
         i.putExtra(KEY_TRIG_ID, trigId);
         i.putExtra(KEY_TRIG_DESC, trigDesc);

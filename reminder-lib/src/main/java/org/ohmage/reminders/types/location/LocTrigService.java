@@ -227,7 +227,7 @@ public class LocTrigService extends Service
     @Override
     public void onCreate() {
         //Let the service live forever
-        setKeepAliveAlarm();
+        setKeepAliveAlarm(this);
 
         //Cache the locations
         mLocList = new LinkedList<LocListItem>();
@@ -307,11 +307,11 @@ public class LocTrigService extends Service
 
     private void connectToRemoteServices() {
         //Connect to WIFIGPS
-        bindService(new Intent(IWiFiGPSLocationService.class.getName()),
+        bindService(new Intent(IWiFiGPSLocationService.class.getName()).setPackage(getPackageName()),
                 mWifiGPSServConn, Context.BIND_AUTO_CREATE);
 
         //Connect to ACCEL
-        bindService(new Intent(IAccelService.class.getName()),
+        bindService(new Intent(IAccelService.class.getName()).setPackage(getPackageName()),
                 mAccelServConn, Context.BIND_AUTO_CREATE);
     }
 
@@ -386,8 +386,8 @@ public class LocTrigService extends Service
         }
     }
 
-    private void setKeepAliveAlarm() {
-        Intent i = new Intent(ACTION_ALRM_SRV_KEEP_ALIVE);
+    private void setKeepAliveAlarm(Context context) {
+        Intent i = new Intent(ACTION_ALRM_SRV_KEEP_ALIVE).setPackage(context.getPackageName());
 
         //set the alarm if not already existing
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i,
@@ -409,7 +409,7 @@ public class LocTrigService extends Service
 
     private Intent createTriggerAlwaysAlarmIntent(int trigId) {
         Intent i = new Intent();
-
+        i.setPackage(getPackageName());
         i.setAction(ACTION_ALM_TRIGGER_ALWAYS);
         i.setData(Uri.parse(DATA_PREFIX_TRIG_ALWAYS_ALM + trigId));
         i.putExtra(KEY_TRIG_ID, trigId);
@@ -994,6 +994,7 @@ public class LocTrigService extends Service
         cancelSamplingAlarm(action);
 
         Intent i = new Intent(action);
+        i.setPackage(getPackageName());
         i.putExtra(KEY_SAMPLING_ALARM_EXTRA, extra);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i,
                 PendingIntent.FLAG_CANCEL_CURRENT);
