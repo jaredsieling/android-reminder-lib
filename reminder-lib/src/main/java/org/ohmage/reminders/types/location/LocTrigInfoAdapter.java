@@ -1,4 +1,3 @@
-
 package org.ohmage.reminders.types.location;
 
 import android.view.LayoutInflater;

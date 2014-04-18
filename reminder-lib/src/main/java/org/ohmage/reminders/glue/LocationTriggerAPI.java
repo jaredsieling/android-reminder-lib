@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 The Regents of the University of California
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +15,10 @@
  ******************************************************************************/
 package org.ohmage.reminders.glue;
 
-import org.ohmage.reminders.types.location.LocTrigTracingSettActivity;
-
 import android.content.Context;
 import android.content.Intent;
+
+import org.ohmage.reminders.types.location.LocTrigTracingSettActivity;
 
 /*
  * APIs exported from location triggers. This class
@@ -27,13 +27,13 @@ import android.content.Intent;
  * (without going through the framework).
  */
 public class LocationTriggerAPI {
-	
-	/*
-	 * Launch the activity with the location tracing settings. 
-	 */
-	public static void launchLocationTracingSettingsActivity(Context context) {
-		
-		context.startActivity(new Intent(context, 
-							      LocTrigTracingSettActivity.class));
-	}
+
+    /*
+     * Launch the activity with the location tracing settings.
+     */
+    public static void launchLocationTracingSettingsActivity(Context context) {
+
+        context.startActivity(new Intent(context,
+                LocTrigTracingSettActivity.class));
+    }
 }

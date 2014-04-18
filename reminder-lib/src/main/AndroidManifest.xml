@@ -2,11 +2,11 @@
     package="org.ohmage.reminders">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +21,7 @@
 
         <activity
             android:name="org.ohmage.reminders.ui.TriggerListActivity"
-            android:label="@string/triggers_title" >
+            android:label="@string/triggers_title">
             <intent-filter>
                 <action android:name="org.ohmage.reminders.VIEW_REMINDERS" />
             </intent-filter>
@@ -58,7 +58,6 @@
         <receiver android:name="org.ohmage.reminders.types.time.TimeTrigService$AlarmReceiver">
             <intent-filter>
                 <action android:name="edu.ucla.cens.triggers.types.time.TimeTriggerAlarm" />
-
                 <data android:scheme="timetrigger" />
             </intent-filter>
         </receiver>
@@ -68,7 +67,6 @@
         <receiver android:name="org.ohmage.reminders.types.location.LocTrigService$AlarmReceiver">
             <intent-filter>
                 <action android:name="org.ohmage.reminders.types.location.LocTrigService.TRIGGER_ALWAYS" />
-
                 <data android:scheme="locationtrigger" />
             </intent-filter>
             <intent-filter>
@@ -87,22 +85,18 @@
         <receiver android:name="org.ohmage.reminders.notif.Notifier$NotifReceiver">
             <intent-filter>
                 <action android:name="edu.ucla.cens.triggers.notif.Notifier.expire_notif" />
-
                 <data android:scheme="notifier" />
             </intent-filter>
             <intent-filter>
                 <action android:name="edu.ucla.cens.triggers.notif.Notifier.repeat_notif" />
-
                 <data android:scheme="notifier" />
             </intent-filter>
             <intent-filter>
                 <action android:name="edu.ucla.cens.triggers.notif.Notifier.notification_deleted" />
-
                 <data android:scheme="notifier" />
             </intent-filter>
             <intent-filter>
                 <action android:name="edu.ucla.cens.triggers.notif.Notifier.notification_clicked" />
-
                 <data android:scheme="notifier" />
             </intent-filter>
         </receiver>
@@ -111,7 +105,9 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyAEkUH1FVkCDrETFD-o7xMJ_WpzeHoFOvQ" />
 
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
     </application>
 

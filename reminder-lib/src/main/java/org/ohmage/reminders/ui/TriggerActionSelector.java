@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 The Regents of the University of California
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,91 +26,91 @@ import org.ohmage.reminders.R;
 import org.ohmage.reminders.base.TriggerActionDesc;
 import org.ohmage.reminders.config.TrigUserConfig;
 
-public class TriggerActionSelector 
-			 implements OnClickListener, 
-			 OnMultiChoiceClickListener {
-	
-	public interface OnClickListener {
-		public void onDone(TriggerActionSelector selector, String actDesc);
-	}
-	
+public class TriggerActionSelector
+        implements OnClickListener,
+        OnMultiChoiceClickListener {
 
-	private TriggerActionDesc mActDesc = new TriggerActionDesc();
-	private String[] mActions;
-	private boolean[] mSelected;
-	private OnClickListener mOnClickListener;
-	private int mTag;
-	private AlertDialog mDialog = null;
-	
-	
-	public TriggerActionSelector(String[] actions, String actDesc) {
-		mActDesc.loadString(actDesc);
-		
-		mActions = new String[actions.length];
-		System.arraycopy(actions, 0, mActions, 0, actions.length);
-		
-		mSelected = new boolean[actions.length];
-		for(int i = 0; i < mSelected.length; i++) {
-			mSelected[i] = mActDesc.hasSurvey(mActions[i]) ? true
-													       : false;
-		}
-	}
-	
-	
-	public TriggerActionSelector setOnClickListener(
-							OnClickListener listener) {
-		
-		mOnClickListener  = listener;
-		return this;
-	}
-	
-	public TriggerActionSelector setTag(int tag) {
-		mTag = tag;
-		return this;
-	}
-	
-	public int getTag() {
-		return mTag;
-	}
-	
-	public Dialog createDialog(Context context, boolean adminMode) {
-		 AlertDialog.Builder builder = 
-			 			new AlertDialog.Builder(context)
-					   .setTitle(R.string.trigger_select_actions)
-					   .setNegativeButton(android.R.string.cancel, this)
-					   .setMultiChoiceItems(mActions, mSelected, this);
-		 
-		 if(adminMode || TrigUserConfig.editTriggerActions) {
-			 builder.setPositiveButton(android.R.string.ok, this);
-		 }
-		 
-			
-		 mDialog = builder.create();
-		 return mDialog;
-	}
-	
+    public interface OnClickListener {
+        public void onDone(TriggerActionSelector selector, String actDesc);
+    }
 
-	@Override
-	public void onClick(DialogInterface dialog, int which) {
-		if(which == AlertDialog.BUTTON_POSITIVE) {
-			mActDesc.clearAllSurveys();
-			
-			for(int i = 0; i < mSelected.length; i++) {
-				if(mSelected[i]) {
-					mActDesc.addSurvey(mActions[i]);
-				}
-			}
-			
-			if(mOnClickListener != null) {
-				mOnClickListener.onDone(this, mActDesc.toString());
-			}
-		}
-		
-		dialog.dismiss();
-	}
 
-	@Override
-	public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-		mSelected[which] = isChecked;
-	}
+    private TriggerActionDesc mActDesc = new TriggerActionDesc();
+    private String[] mActions;
+    private boolean[] mSelected;
+    private OnClickListener mOnClickListener;
+    private int mTag;
+    private AlertDialog mDialog = null;
+
+
+    public TriggerActionSelector(String[] actions, String actDesc) {
+        mActDesc.loadString(actDesc);
+
+        mActions = new String[actions.length];
+        System.arraycopy(actions, 0, mActions, 0, actions.length);
+
+        mSelected = new boolean[actions.length];
+        for (int i = 0; i < mSelected.length; i++) {
+            mSelected[i] = mActDesc.hasSurvey(mActions[i]) ? true
+                    : false;
+        }
+    }
+
+
+    public TriggerActionSelector setOnClickListener(
+            OnClickListener listener) {
+
+        mOnClickListener = listener;
+        return this;
+    }
+
+    public TriggerActionSelector setTag(int tag) {
+        mTag = tag;
+        return this;
+    }
+
+    public int getTag() {
+        return mTag;
+    }
+
+    public Dialog createDialog(Context context, boolean adminMode) {
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(context)
+                        .setTitle(R.string.trigger_select_actions)
+                        .setNegativeButton(android.R.string.cancel, this)
+                        .setMultiChoiceItems(mActions, mSelected, this);
+
+        if (adminMode || TrigUserConfig.editTriggerActions) {
+            builder.setPositiveButton(android.R.string.ok, this);
+        }
+
+
+        mDialog = builder.create();
+        return mDialog;
+    }
+
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if (which == AlertDialog.BUTTON_POSITIVE) {
+            mActDesc.clearAllSurveys();
+
+            for (int i = 0; i < mSelected.length; i++) {
+                if (mSelected[i]) {
+                    mActDesc.addSurvey(mActions[i]);
+                }
+            }
+
+            if (mOnClickListener != null) {
+                mOnClickListener.onDone(this, mActDesc.toString());
+            }
+        }
+
+        dialog.dismiss();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+        mSelected[which] = isChecked;
+    }
 }

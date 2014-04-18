@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent">
 
     <LinearLayout
         android:id="@+id/container"
@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:weightSum="1" >
+        android:weightSum="1">
 
         <Button
             android:id="@+id/trig_edit_cancel"
@@ -19,8 +19,7 @@
             android:layout_marginLeft="@dimen/gutter"
             android:layout_marginRight="@dimen/gutter"
             android:layout_weight="0.5"
-            android:text="@android:string/cancel" >
-        </Button>
+            android:text="@android:string/cancel"></Button>
 
         <Button
             android:id="@+id/trig_edit_done"
@@ -30,8 +29,7 @@
             android:layout_marginLeft="@dimen/gutter"
             android:layout_marginRight="@dimen/gutter"
             android:layout_weight="0.5"
-            android:text="@android:string/ok" >
-        </Button>
+            android:text="@android:string/ok"></Button>
 
     </LinearLayout>
 

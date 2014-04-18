@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/text1"
@@ -27,7 +27,7 @@
         android:layout_marginBottom="@dimen/halfgutter"
         android:layout_marginLeft="@dimen/halfgutter"
         android:layout_marginRight="@dimen/halfgutter"
-        android:weightSum="1.0" >
+        android:weightSum="1.0">
 
         <EditText
             android:id="@+id/trigger_text_add_categ"

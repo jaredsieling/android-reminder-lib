@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 The Regents of the University of California
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -212,14 +212,10 @@ public class NotifEditActivity extends ListActivity implements OnClickListener {
                 if (pos == LIST_POS_DURATION || pos == LIST_POS_SUPPRESSION) {
 
                     view = getTwoLineView(inflater, pos);
-                }
-
-                else if (pos == LIST_POS_REPEAT_HEADER) {
+                } else if (pos == LIST_POS_REPEAT_HEADER) {
 
                     view = getRepeatHeaderView(inflater, pos);
-                }
-
-                else {
+                } else {
 
                     view = getRepeatItemView(inflater, pos);
                 }
@@ -284,7 +280,7 @@ public class NotifEditActivity extends ListActivity implements OnClickListener {
                 break;
 
             case LIST_POS_REPEAT_HEADER: // Repeat header, ignore. Nothing
-                                         // to edit here.
+                // to edit here.
                 return null;
 
             default: // Any other id would correspond to a repeat value

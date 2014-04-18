@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 The Regents of the University of California
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,12 +61,12 @@ import com.google.android.gms.maps.model.LatLngBounds.Builder;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.ohmage.reminders.base.Utilities;
 import org.ohmage.reminders.R;
-import org.ohmage.reminders.config.LocTrigConfig;
-import org.ohmage.reminders.utils.TrigTextInput;
 import org.ohmage.reminders.base.TouchableSupportMapFragment;
 import org.ohmage.reminders.base.TouchableSupportMapFragment.TouchableWrapper.OnTouchListener;
+import org.ohmage.reminders.base.Utilities;
+import org.ohmage.reminders.config.LocTrigConfig;
+import org.ohmage.reminders.utils.TrigTextInput;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -76,7 +76,7 @@ import java.util.Locale;
 /**
  * The maps activity to display and modify the coordinates associated with each
  * place (category). Updated to use Android Google Maps v2.
- * 
+ *
  * @author cketcham
  */
 public class LocTrigMapsActivity extends FragmentActivity {
@@ -351,7 +351,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
     /**
      * Called when the user long presses on the map to add a new location marker
      * on the map.
-     * 
+     *
      * @param point
      */
     private void onAddTemporaryMarker(LatLng point) {
@@ -368,7 +368,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
     /**
      * Test to see if we are pressing inside the radius of the current focused
      * marker
-     * 
+     *
      * @param point
      * @return
      */
@@ -386,7 +386,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
     /**
      * Called when the user long presses inside the radius circle for focused
      * marker. Starts the radius resize.
-     * 
+     *
      * @param marker
      */
     private void onRadiusUpdateFocus(Marker marker) {
@@ -411,7 +411,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
     /**
      * Called when the radius is updated with the new location p of which can be
      * used to calculate the new radius
-     * 
+     *
      * @param p
      */
     private void onRadiusUpdate(Point p) {
@@ -453,7 +453,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
     /**
      * Called when the user long presses on a marker. Will delete the marker
      * from the db.
-     * 
+     *
      * @param point
      * @return
      */
@@ -554,7 +554,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
 
     /**
      * Handles the search result. Will show a marker to display
-     * 
+     *
      * @param adr
      */
     private void handleSearchResult(Address adr) {
@@ -564,7 +564,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
 
     /**
      * Converts an address to a marker to show on the map
-     * 
+     *
      * @param adr
      * @return
      */
@@ -582,14 +582,14 @@ public class LocTrigMapsActivity extends FragmentActivity {
     /**
      * Shows a marker on the map and animates to it. This is used when the user
      * is given the option of adding a new location.
-     * 
+     *
      * @param options
      */
     private void showAddMarker(MarkerOptions options) {
         mAddMarker = mMap.addMarker(options);
         mAddMarker.showInfoWindow();
         CameraUpdate update;
-        if(mMap.getCameraPosition().zoom < 16)
+        if (mMap.getCameraPosition().zoom < 16)
             update = CameraUpdateFactory.newLatLngZoom(options.getPosition(), 16);
         else
             update = CameraUpdateFactory.newLatLng(options.getPosition());
@@ -619,7 +619,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
 
     /**
      * Display a dialog message TODO: make a fragment
-     * 
+     *
      * @param cName
      * @param resId
      */
@@ -638,7 +638,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
 
     /**
      * Check if a location overlaps a location is another category.
-     * 
+     *
      * @param categId
      * @param gp
      * @param radius
@@ -837,7 +837,7 @@ public class LocTrigMapsActivity extends FragmentActivity {
 
             StringBuilder addr = new StringBuilder();
 
-            if(address != null) {
+            if (address != null) {
                 int addrLines = address.getMaxAddressLineIndex();
 
                 for (int i = 0; i < Math.min(2, addrLines); i++) {

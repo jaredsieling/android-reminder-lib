@@ -1,12 +1,11 @@
-
 package org.ohmage.reminders.base;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-import org.ohmage.reminders.base.AdminDialogFragment.AdminCodeListener;
 import org.ohmage.reminders.R;
+import org.ohmage.reminders.base.AdminDialogFragment.AdminCodeListener;
 
 /**
  * <p>
@@ -19,7 +18,7 @@ import org.ohmage.reminders.R;
  * {@link Activity#RESULT_OK} if the pin is entered correctly, and
  * {@link Activity#RESULT_CANCELED} if it is not
  * </p>
- * 
+ *
  * @author cketcham
  */
 public class AdminPincodeActivity extends FragmentActivity implements AdminCodeListener {

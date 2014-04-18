@@ -20,7 +20,7 @@ public class MainActivity extends ActionBarActivity {
         findViewById(R.id.show_reminders).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(),TriggerListActivity.class);
+                Intent intent = new Intent(getBaseContext(), TriggerListActivity.class);
                 intent.putExtra(TriggerListActivity.EXTRA_CAMPAIGN_URN, "campaign_urn");
                 intent.putExtra(TriggerListActivity.EXTRA_NAME, "campaign_name");
                 String[] actions = new String[2];
@@ -35,7 +35,6 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -52,5 +51,4 @@ public class MainActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

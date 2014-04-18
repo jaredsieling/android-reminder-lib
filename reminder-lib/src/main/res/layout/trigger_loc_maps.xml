@@ -10,7 +10,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="false"
-        android:padding="@dimen/halfgutter" >
+        android:padding="@dimen/halfgutter">
 
         <Button
             android:id="@+id/button_maps_done"

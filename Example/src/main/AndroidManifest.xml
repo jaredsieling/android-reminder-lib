@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="org.ohmage.reminders.example.TriggerNotificationReceiver" >
+        <receiver android:name="org.ohmage.reminders.example.TriggerNotificationReceiver">
             <intent-filter>
                 <action android:name="org.ohmage.reminders.TRIGGER_NOTIFICATION" />
             </intent-filter>

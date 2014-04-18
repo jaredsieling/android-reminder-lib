@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 The Regents of the University of California
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,8 +38,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.ohmage.reminders.base.AdminPincodeActivity;
 import org.ohmage.reminders.R;
+import org.ohmage.reminders.base.AdminPincodeActivity;
 import org.ohmage.reminders.base.TriggerActionDesc;
 import org.ohmage.reminders.base.TriggerBase;
 import org.ohmage.reminders.base.TriggerDB;
@@ -74,7 +74,7 @@ public class TriggerListActivity extends ListActivity {
     private static final String KEY_SAVE_DIALOG_TEXT = TriggerListActivity.class.getName()
             + ".dialog_text";
 
-     private static final int MENU_ID_DELETE_TRIGGER = 0;
+    private static final int MENU_ID_DELETE_TRIGGER = 0;
 
     private static final int DIALOG_ID_ADD_NEW = 0;
     private static final int DIALOG_ID_PREFERENCES = 1;
@@ -89,7 +89,7 @@ public class TriggerListActivity extends ListActivity {
     private TriggerTypeMap mTrigMap;
     private String[] mActions;
     private String[] mPreselectedActions; // actions which will be preselected
-                                          // in a new trigger window
+    // in a new trigger window
     private String mCampaignUrn;
     private String mCampaignName;
     private int mDialogTrigId = -1;
@@ -166,9 +166,9 @@ public class TriggerListActivity extends ListActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        if(mCursor != null)
+        if (mCursor != null)
             mCursor.close();
-        if(mDb != null)
+        if (mDb != null)
             mDb.close();
     }
 
@@ -321,11 +321,11 @@ public class TriggerListActivity extends ListActivity {
         mCursor.moveToFirst();
         startManagingCursor(mCursor);
 
-        String[] from = new String[] {
+        String[] from = new String[]{
                 TriggerDB.KEY_ID, TriggerDB.KEY_ID, TriggerDB.KEY_ID, TriggerDB.KEY_ID
         };
 
-        int[] to = new int[] {
+        int[] to = new int[]{
                 R.id.text1, R.id.text2, R.id.button_actions_edit, R.id.icon_trigger_type
         };
 

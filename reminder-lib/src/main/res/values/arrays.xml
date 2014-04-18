@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2007 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2007 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,18 +14,18 @@
 -->
 
 <resources>
-	<string-array name="notification_vibration_entries">
-		<item>No Vibration</item>
-		<item>1 second</item>
-		<item>2 seconds</item>
-		<item>3 seconds</item>
-		<item>5 seconds</item>
-	</string-array>
-	<string-array name="notification_vibration_values">
-		<item>0</item>
-		<item>1000</item>
-		<item>2000</item>
-		<item>3000</item>
-		<item>5000</item>
-	</string-array>
+    <string-array name="notification_vibration_entries">
+        <item>No Vibration</item>
+        <item>1 second</item>
+        <item>2 seconds</item>
+        <item>3 seconds</item>
+        <item>5 seconds</item>
+    </string-array>
+    <string-array name="notification_vibration_values">
+        <item>0</item>
+        <item>1000</item>
+        <item>2000</item>
+        <item>3000</item>
+        <item>5000</item>
+    </string-array>
 </resources>

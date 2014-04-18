@@ -1,4 +1,3 @@
-
 package org.ohmage.reminders.base;
 
 import android.content.Context;

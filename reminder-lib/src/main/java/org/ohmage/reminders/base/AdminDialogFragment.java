@@ -73,7 +73,7 @@ public class AdminDialogFragment extends DialogFragment {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                    if(!mSuccess) {
+                    if (!mSuccess) {
                         Toast.makeText(getActivity(), R.string.admin_dialog_invalid_pin, Toast.LENGTH_SHORT).show();
                     }
                 }
