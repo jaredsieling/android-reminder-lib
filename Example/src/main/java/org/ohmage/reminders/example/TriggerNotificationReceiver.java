@@ -21,6 +21,9 @@ import android.content.Intent;
 import android.util.Log;
 
 import org.ohmage.reminders.glue.TriggerFramework;
+import org.ohmage.reminders.notif.Notifier;
+
+import java.util.ArrayList;
 
 public class TriggerNotificationReceiver extends BroadcastReceiver {
 
@@ -32,7 +35,8 @@ public class TriggerNotificationReceiver extends BroadcastReceiver {
         Log.v(TAG, "Broadcast received: " + action);
 
         if (TriggerFramework.ACTION_TRIGGER_NOTIFICATION.equals(action)) {
-            Log.d(TAG, "do something");
+            ArrayList<String> surveys = intent.getStringArrayListExtra(Notifier.EXTRA_SURVEYS);
+            Log.d(TAG, "do something for " + surveys.toString());
         }
     }
 }

@@ -2,7 +2,9 @@
 <resources>
 
     <string name="app_name">ReminderLib</string>
-    <string name="show_reminders">Show Reminders</string>
+    <string name="show_all_reminders">Show All Reminders</string>
+    <string name="show_specific_reminders">Show Specific Reminders</string>
+    <string name="show_group_reminders">Show Group Reminders</string>
     <string name="action_settings">Settings</string>
 
 </resources>

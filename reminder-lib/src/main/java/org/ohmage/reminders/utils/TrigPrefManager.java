@@ -26,12 +26,12 @@ public class TrigPrefManager {
     private static final String PREF_FILE_NAME
             = TrigPrefManager.class.getName();
 
-    public static void registerPreferenceFile(Context context, String campaignUrn, String filePrefix) {
+    public static void registerPreferenceFile(Context context, String filePrefix) {
         SharedPreferences prefs = context.getSharedPreferences(
-                PREF_FILE_NAME + "_" + campaignUrn, Context.MODE_PRIVATE);
+                PREF_FILE_NAME + "_" + "GLOBAL", Context.MODE_PRIVATE);
 
         Editor editor = prefs.edit();
-        editor.putBoolean(filePrefix + "_" + campaignUrn, true);
+        editor.putBoolean(filePrefix + "_" + "GLOBAL", true);
         editor.commit();
     }
 
@@ -59,10 +59,10 @@ public class TrigPrefManager {
 //        editMan.commit();
 //    }
 
-    public static void clearPreferenceFiles(Context context, String campaignUrn) {
+    public static void clearPreferenceFiles(Context context) {
 
         SharedPreferences prefMan = context.getSharedPreferences(
-                PREF_FILE_NAME + "_" + campaignUrn, Context.MODE_PRIVATE);
+                PREF_FILE_NAME + "_" + "GLOBAL", Context.MODE_PRIVATE);
 
         Map<String, ?> prefFileList = prefMan.getAll();
         if (prefFileList == null) {

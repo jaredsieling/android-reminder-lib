@@ -4,4 +4,9 @@
     <string name="add">Add</string>
     <string name="admin_dialog_title">Enter pin code:</string>
     <string name="admin_dialog_invalid_pin">Wrong pin code.</string>
+    <string name="notifications_multi_title">%d Surveys</string>
+    <plurals name="survey_notification_message">
+        <item quantity="one">There is a survey to take.</item>
+        <item quantity="other">There are surveys to take.</item>
+    </plurals>
 </resources>

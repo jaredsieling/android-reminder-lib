@@ -27,12 +27,12 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import org.ohmage.reminders.R;
+import org.ohmage.reminders.base.Actions;
 import org.ohmage.reminders.base.TriggerActionDesc;
 import org.ohmage.reminders.config.TrigUserConfig;
 import org.ohmage.reminders.ui.ActionSelectorView;
@@ -74,8 +74,8 @@ public class TimeTrigEditActivity extends PreferenceActivity implements View.OnC
     private boolean[] mRepeatStatus;
     private boolean mAdminMode = false;
     private AlertDialog mRepeatDialog = null;
-    private String[] mActions;
     private boolean[] mActSelected = null;
+    private Actions mActions;
 
     public interface ExitListener {
 
@@ -95,13 +95,8 @@ public class TimeTrigEditActivity extends PreferenceActivity implements View.OnC
         mTrigDesc = new TimeTrigDesc();
         mActDesc = new TriggerActionDesc();
 
-        if (getIntent().hasExtra(TriggerListActivity.EXTRA_ACTIONS)) {
-            mActions = getIntent().getStringArrayExtra(TriggerListActivity.EXTRA_ACTIONS);
-        } else {
-            Log.e(TAG, "TimeTrigEditActivity: Invoked with out passing surveys");
-            finish();
-            return;
-        }
+        String[] selectParams = getIntent().getStringArrayExtra(TriggerListActivity.EXTRA_ACTIONS);
+        mActions = new Actions(this, selectParams);
 
         PreferenceScreen screen = getPreferenceScreen();
         int prefCount = screen.getPreferenceCount();
@@ -356,7 +351,14 @@ public class TimeTrigEditActivity extends PreferenceActivity implements View.OnC
     private void updateActionsPrefStatus() {
         Preference actionsPref = getPreferenceScreen().findPreference(PREF_KEY_ACTIONS);
         if (mActDesc.getSurveys().length > 0) {
-            actionsPref.setSummary(stringArrayToString(mActDesc.getSurveys()));
+            StringBuilder actions = new StringBuilder();
+            for (String id : mActDesc.getSurveys()) {
+                if (actions.length() != 0) {
+                    actions.append(", ");
+                }
+                actions.append(mActions.getName(id));
+            }
+            actionsPref.setSummary(actions.toString());
         } else {
             actionsPref.setSummary(R.string.trigger_no_actions);
         }
@@ -470,15 +472,15 @@ public class TimeTrigEditActivity extends PreferenceActivity implements View.OnC
 
     private Dialog createEditActionDialog() {
         if (mActSelected == null) {
-            mActSelected = new boolean[mActions.length];
+            mActSelected = new boolean[mActions.size()];
             for (int i = 0; i < mActSelected.length; i++) {
-                mActSelected[i] = mActDesc.hasSurvey(mActions[i]);
+                mActSelected[i] = mActDesc.hasSurvey(mActions.getId(i));
             }
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.trigger_select_actions).setNegativeButton(android.R.string.cancel, null)
-                .setView(new ActionSelectorView(getBaseContext(), mActions, mActSelected));
+                .setView(new ActionSelectorView(getBaseContext(), mActions.getNames(), mActSelected));
 
         /*
          * AlertDialog.Builder builder = new AlertDialog.Builder(this)
@@ -499,7 +501,7 @@ public class TimeTrigEditActivity extends PreferenceActivity implements View.OnC
 
                     for (int i = 0; i < mActSelected.length; i++) {
                         if (mActSelected[i]) {
-                            mActDesc.addSurvey(mActions[i]);
+                            mActDesc.addSurvey(mActions.getId(i));
                         }
                     }
                     dialog.dismiss();

@@ -46,7 +46,7 @@ public class TriggerDB {
     private static final String TAG = "TriggerFramework";
 
     private static final String DATABASE_NAME = "trigger_framework";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     /* Table name */
     private static final String TABLE_TRIGGERS = "triggers";
@@ -144,27 +144,43 @@ public class TriggerDB {
     }
 
     /*
-     * Get all the triggers corresponding to a type for a campaign
+     * Get all the triggers corresponding to a type for a campaign, or for all triggers of a type
+     * if campaignUrn is null, or for all triggers if trigType is also null
      */
     public Cursor getTriggers(String campaignUrn, String trigType) {
         Log.v(TAG, "DB: getTriggers(" + trigType + ")");
 
-        return mDb.query(TABLE_TRIGGERS, null,
-                KEY_CAMPAIGN_URN + "=? AND " + KEY_TRIG_TYPE + "=?",
-                new String[]{campaignUrn, trigType},
-                null, null, null);
+        StringBuilder selectBuilder = new StringBuilder();
+        ArrayList<String> selectArgs = new ArrayList<String>();
+        if (campaignUrn != null) {
+            selectBuilder.append(KEY_CAMPAIGN_URN + "=?");
+            selectArgs.add(campaignUrn);
+        }
+
+        if (trigType != null) {
+            if (selectBuilder.length() != 0) {
+                selectBuilder.append(" AND ");
+            }
+            selectBuilder.append(KEY_TRIG_TYPE + "=?");
+            selectArgs.add(trigType);
+        }
+
+        return mDb.query(TABLE_TRIGGERS, null, selectBuilder.toString(),
+                selectArgs.toArray(new String[]{}), null, null, null);
     }
 
     /*
      * Get all triggers in the system for a campaign
      */
     public Cursor getAllTriggers(String campaignUrn) {
-        Log.v(TAG, "DB: getAllTriggers");
+        return getTriggers(campaignUrn, null);
+    }
 
-        return mDb.query(TABLE_TRIGGERS, null,
-                KEY_CAMPAIGN_URN + "=?",
-                new String[]{campaignUrn},
-                null, null, null);
+    /*
+     * Get all triggers in the system
+     */
+    public Cursor getAllTriggers() {
+        return mDb.query(TABLE_TRIGGERS, null, null, null, null, null, null);
     }
 
     public ArrayList<Campaign> getAllCampaigns() {
@@ -436,8 +452,8 @@ public class TriggerDB {
             final String QUERY_CREATE_TRIGGERS_TB =
                     "create table " + TABLE_TRIGGERS + " ("
                             + KEY_ID + " integer primary key autoincrement, "
-                            + KEY_CAMPAIGN_URN + " text not null, "
-                            + KEY_CAMPAIGN_NAME + " text not null, "
+                            + KEY_CAMPAIGN_URN + " text, "
+                            + KEY_CAMPAIGN_NAME + " text, "
                             + KEY_TRIG_TYPE + " text not null, "
                             + KEY_TRIG_DESCRIPT + " text, "
                             + KEY_TRIG_ACTION_DESCRIPT + " text, "

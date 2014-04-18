@@ -98,7 +98,7 @@ public class TriggerInit {
         db.close();
 
         //Refresh the notification display
-        Notifier.refreshNotification(context, campaignUrn, campaignName, true);
+        Notifier.refreshNotification(context, true);
     }
 
 
@@ -106,15 +106,15 @@ public class TriggerInit {
      * Resets all triggers, settings and preferences to its default.
      * Removes all triggers from the database after stopping them.
      */
-    public static boolean resetTriggersAndSettings(Context context, String campaignUrn, String campaignName) {
-        Log.v(TAG, "TriggerInit: Resetting all triggers for " + campaignUrn);
+    public static boolean resetTriggersAndSettings(Context context) {
+        Log.v(TAG, "TriggerInit: Resetting all triggers");
 
         TriggerTypeMap trigMap = new TriggerTypeMap();
 
         TriggerDB db = new TriggerDB(context);
         db.open();
 
-        Cursor c = db.getAllTriggers(campaignUrn);
+        Cursor c = db.getAllTriggers();
 
         //Stop and delete all triggers
         if (c.moveToFirst()) {
@@ -135,10 +135,7 @@ public class TriggerInit {
         db.close();
 
         //Refresh the notification display
-        Notifier.refreshNotification(context, campaignUrn, campaignName, true);
-
-        //Clear all preference files registered with the preference manager
-        TrigPrefManager.clearPreferenceFiles(context, campaignUrn);
+        Notifier.refreshNotification(context, true);
 
         return true;
     }
@@ -146,14 +143,9 @@ public class TriggerInit {
     public static boolean resetAllTriggersAndSettings(Context context) {
         Log.v(TAG, "TriggerInit: Resetting all triggers");
 
-        TriggerDB dbHelper = new TriggerDB(context);
-        dbHelper.open();
-        for (TriggerDB.Campaign c : dbHelper.getAllCampaigns()) {
-            resetTriggersAndSettings(context, c.urn, c.name);
-        }
-        dbHelper.close();
+        resetTriggersAndSettings(context);
 
-        TrigPrefManager.clearPreferenceFiles(context, "GLOBAL");
+        TrigPrefManager.clearPreferenceFiles(context);
 
         TriggerTypeMap trigMap = new TriggerTypeMap();
 

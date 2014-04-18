@@ -175,9 +175,7 @@ public class LocTrigSettingsActivity extends ListActivity implements OnClickList
 
         TriggerDB dbHelper = new TriggerDB(this);
         dbHelper.open();
-        for (TriggerDB.Campaign c : dbHelper.getAllCampaigns()) {
-            trigIds.addAll(mLocTrigger.getAllActiveTriggerIds(this, c.urn));
-        }
+        trigIds.addAll(mLocTrigger.getAllActiveTriggerIds(this, null));
         dbHelper.close();
 
         for (int trigId : trigIds) {
@@ -198,9 +196,7 @@ public class LocTrigSettingsActivity extends ListActivity implements OnClickList
 
         TriggerDB dbHelper = new TriggerDB(this);
         dbHelper.open();
-        for (TriggerDB.Campaign c : dbHelper.getAllCampaigns()) {
-            trigIds.addAll(mLocTrigger.getAllActiveTriggerIds(this, c.urn));
-        }
+        trigIds.addAll(mLocTrigger.getAllActiveTriggerIds(this, null));
         dbHelper.close();
 
         for (int trigId : trigIds) {

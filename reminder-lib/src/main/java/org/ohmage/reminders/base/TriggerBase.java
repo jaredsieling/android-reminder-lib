@@ -15,6 +15,7 @@
  ******************************************************************************/
 package org.ohmage.reminders.base;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
@@ -22,11 +23,15 @@ import android.location.LocationManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
+import org.ohmage.reminders.base.ReminderContract.Reminders;
 import org.ohmage.reminders.notif.NotifDesc;
+import org.ohmage.reminders.notif.NotifSurveyAdaptor;
 import org.ohmage.reminders.notif.Notifier;
 
 import java.util.LinkedList;
+import java.util.Set;
 
 /*
  * The abstract class which must be extended by all the triggers
@@ -59,7 +64,8 @@ public abstract class TriggerBase {
         desc.loadString(rtDesc);
 
         //Save trigger time stamp in the run time description
-        desc.setTriggerTimeStamp(System.currentTimeMillis());
+        long now = System.currentTimeMillis();
+        desc.setTriggerTimeStamp(now);
         //Save trigger current loc in the run time description
         LocationManager locMan = (LocationManager)
                 context.getSystemService(Context.LOCATION_SERVICE);
@@ -72,7 +78,71 @@ public abstract class TriggerBase {
         //Call the notifier to display the notification
         //Pass the notification description corresponding to this trigger
         Notifier.notifyNewTrigger(context, trigId, db.getNotifDescription(trigId));
+
         db.close();
+
+        // Set all the surveys which were triggered to the pending state
+        setTriggerSurveysPending(context, now, trigId);
+    }
+
+    /**
+     * Sets all active surveys for a trigger to be pending
+     *
+     * @param context
+     * @param trigId
+     */
+    private static void setTriggerSurveysPending(Context context, long time, int trigId) {
+        updatePendingStateForSurveys(context, time,
+                NotifSurveyAdaptor.getActiveSurveysForTrigger(context, trigId));
+    }
+
+    /**
+     * Updates the pending state for surveys. It doesn't check to see if the survey should actually
+     * be pending so callers must know that the state is correct.
+     *
+     * @param context
+     * @param time
+     * @param surveys
+     */
+    public static void updatePendingStateForSurveys(Context context, long time,
+                                                    String... surveys) {
+        StringBuilder select = new StringBuilder();
+        for (int i = 0; i < surveys.length; i++) {
+            if (select.length() != 0) {
+                select.append(" OR ");
+            }
+            select.append(Reminders._ID + "=?");
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(Reminders.REMINDER_PENDING_TIME, time);
+        values.put(Reminders.REMINDER_PENDING_TIMEZONE, DateTimeZone.getDefault().getID());
+        context.getContentResolver().update(Reminders.buildRemindersUri(), values,
+                select.toString(), surveys);
+    }
+
+    /**
+     * This must be called after a survey is pending or after a survey is no longer pending.
+     *
+     * @param context
+     * @param time
+     * @param ids
+     */
+    private static void updatePendingStateForSurveys(Context context, long time,
+                                                     Set<String> ids) {
+        String[] selectArgs = ids.toArray(new String[]{});
+        if (time == Reminders.NOT_PENDING) {
+            // Find all surveys for this trigger which are not still active from some other trigger
+            Set<String> activeSurveys = NotifSurveyAdaptor.getAllActiveSurveys(context, null);
+            ids.removeAll(activeSurveys);
+            selectArgs = ids.toArray(new String[]{});
+        }
+
+        if (selectArgs.length == 0) {
+            return;
+        }
+
+        updatePendingStateForSurveys(context, time, selectArgs);
     }
 
     /*
@@ -227,10 +297,14 @@ public abstract class TriggerBase {
             if (trigType.equals(this.getTriggerType())) {
                 //Stop trigger first
                 stopTrigger(context, trigId, db.getTriggerDescription(trigId));
+                //Get surveys for trigger
+                Set<String> surveys = NotifSurveyAdaptor.getActiveSurveysForTrigger(context, trigId);
                 //Delete from database
                 db.deleteTrigger(trigId);
+                //Update pending state for surveys which were removed
+                TriggerBase.updatePendingStateForSurveys(context, Reminders.NOT_PENDING, surveys);
                 //Now refresh the notification display
-                Notifier.removeTriggerNotification(context, trigId, campaign.urn, campaign.name);
+                Notifier.removeTriggerNotification(context, trigId);
             }
         }
 

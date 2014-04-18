@@ -24,16 +24,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.RingtoneManager;
-import android.net.Uri;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.ohmage.reminders.R;
+import org.ohmage.reminders.base.ReminderContract.Reminders;
+import org.ohmage.reminders.base.TriggerBase;
 import org.ohmage.reminders.base.TriggerDB;
-import org.ohmage.reminders.utils.TrigPrefManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -78,8 +80,8 @@ public class Notifier {
             "edu.ucla.cens.triggers.notif.Notifier.expire_notif";
     private static final String ACTION_REPEAT_ALM =
             "edu.ucla.cens.triggers.notif.Notifier.repeat_notif";
-    private static final String DATA_PREFIX_ALM =
-            "notifier://edu.ucla.cens.triggers.notif.Notifier/";
+
+    public static final String EXTRA_SURVEYS = Notifier.class.getName() + ".extra_surveys";
 
     private static final String KEY_TRIGGER_ID =
             Notifier.class.getName() + ".trigger_id";
@@ -89,9 +91,6 @@ public class Notifier {
     private static final String KEY_NOTIF_VISIBILITY_PREF =
             "notif_visibility";
 
-    public static final String KEY_CAMPAIGN_URN = "campaign_urn";
-    public static final String KEY_CAMPAIGN_NAME = "campaign_name";
-
     /*
      * Utility function to save the status of the notification when it
      * is cleared from the home screen. The status is persistently stored
@@ -100,63 +99,67 @@ public class Notifier {
      * and it needs to be refreshed quietly (without alerting the user), no
      * action is required.
      */
-    private static void hideNotification(Context context, String campaignUrn) {
+    private static void hideNotification(Context context) {
         NotificationManager notifMan = (NotificationManager) context.getSystemService(
                 Context.NOTIFICATION_SERVICE);
 
-        notifMan.cancel(campaignUrn.hashCode());
-        saveNotifVisibility(context, campaignUrn, false);
+        notifMan.cancel(NOIF_ID);
+        saveNotifVisibility(context, false);
     }
 
-    private static void displayNotification(Context context,
-                                            String campaignUrn,
-                                            String title,
-                                            String summary,
-                                            boolean quiet) {
+    private static void displayNotification(Context context, ArrayList<String> surveys, boolean quiet) {
 
-        /*
-         * If the notification is to be refreshed quietly, and if it
-         * is hidden, do nothing.
-         */
-        if (quiet && !getNotifVisibility(context, campaignUrn)) {
+        // If the notification is to be refreshed quietly, and if it is hidden, do nothing.
+        if (quiet && !getNotifVisibility(context)) {
             return;
         }
 
+        // Cancel any alarms to reshow the notification because we are showing it now
+        cancelAlarm(context, ACTION_NOTIF_RESHOW);
+
         NotificationManager notifMan = (NotificationManager) context.getSystemService(
                 Context.NOTIFICATION_SERVICE);
 
-
-        Notification notif = new Notification(R.drawable.survey_notification,
-                title, System.currentTimeMillis());
-
-        if (!quiet) {
-            SharedPreferences ringtonePrefs = PreferenceManager.getDefaultSharedPreferences(context);
-            notif.defaults = Notification.DEFAULT_LIGHTS;
-            notif.sound = Uri.parse(ringtonePrefs.getString("notification_ringtone", RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString()));
-            long duration = Long.parseLong(ringtonePrefs.getString("notification_vibration", "2000"));
-            if (duration > 0) {
-                notif.vibrate = new long[]{0, 200, 200, duration - 800, 200, 200};
-            }
-        } else {
-            // If it is a quiet update, disable the ticker as well
-            notif.tickerText = null;
-        }
-
         //Watch for notification cleared events
-        notif.deleteIntent = PendingIntent.getBroadcast(context, 0,
-                new Intent(ACTION_NOTIF_DELETED).setPackage(context.getPackageName()).putExtra(KEY_CAMPAIGN_URN, campaignUrn).putExtra(KEY_CAMPAIGN_NAME, title).setData(Uri.parse(DATA_PREFIX_ALM + campaignUrn)),
+        Intent deleteIntent = new Intent(context, NotifReceiver.class)
+                .setAction(ACTION_NOTIF_DELETED);
+        PendingIntent piDelete = PendingIntent.getBroadcast(context, 0, deleteIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
         //Watch for notification clicked events
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0,
-                new Intent(ACTION_NOTIF_CLICKED).setPackage(context.getPackageName()).putExtra(KEY_CAMPAIGN_URN, campaignUrn).putExtra(KEY_CAMPAIGN_NAME, title).setData(Uri.parse(DATA_PREFIX_ALM + campaignUrn)),
+        Intent intent = new Intent(context, NotifReceiver.class).setAction(ACTION_NOTIF_CLICKED)
+                .putExtra(EXTRA_SURVEYS, new ArrayList<String>(surveys));
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
-        notif.setLatestEventInfo(context, title, summary, pi);
-        notifMan.notify(campaignUrn.hashCode(), notif);
+        // Constructs the Builder object.
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.survey_notification)
+                        .setContentText(context.getResources().getQuantityString(R.plurals.survey_notification_message, surveys.size()))
+                        .setAutoCancel(true)
+                        .setContentTitle(context.getString(R.string.notifications_multi_title,
+                                surveys.size()))
+                        .setContentIntent(pi)
+                        .setDeleteIntent(piDelete);
+
+        if(!quiet) {
+            builder.setDefaults(Notification.DEFAULT_ALL);
+        }
+
+        if (surveys.size() == 1) {
+            // Get the survey name
+            Cursor cursor = context.getContentResolver().query(Reminders.buildRemindersUri(),
+                    new String[]{Reminders.REMINDER_NAME}, Reminders._ID + "=?",
+                    new String[]{surveys.get(0)}, null);
+            if (cursor.moveToFirst()) {
+                builder.setContentTitle(cursor.getString(0));
+            }
+        }
+        notifMan.notify(NOIF_ID, builder.build());
 
         //Save the current visibility
-        saveNotifVisibility(context, campaignUrn, true);
+        saveNotifVisibility(context, true);
     }
 
     /*
@@ -186,46 +189,28 @@ public class Notifier {
      * reminder. The notification can be refreshed quietly when a trigger
      * expires.
      */
-    public static void refreshNotification(Context context, String campaignUrn, String name, boolean quiet) {
+    public static void refreshNotification(Context context, boolean quiet) {
 
         Log.v(TAG, "Notifier: Refreshing notification, quiet = " + quiet);
 
         //Get the list of all the surveys active at the moment
-        Set<String> actSurveys = NotifSurveyAdaptor.getAllActiveSurveys(context, campaignUrn);
+        Set<String> actSurveys = NotifSurveyAdaptor.getAllActiveSurveys(context, null);
 
         //Remove the notification if there are no active surveys
         if (actSurveys.size() == 0) {
             Log.v(TAG, "Notifier: No active surveys");
-            hideNotification(context, campaignUrn);
+            hideNotification(context);
         } else {
             //Prepare the message and display the notification
-
-            String summary = "You have " + actSurveys.size() +
-                    " survey" + (actSurveys.size() != 1 ? "s" : "") +
-                    " to take";
-
-            //displayNotification(context, campaignUrn, title, getSurveyDisplayList(actSurveys), quiet);
-            displayNotification(context, campaignUrn, name, summary, quiet);
+            displayNotification(context, new ArrayList<String>(actSurveys), quiet);
         }
-
-        //Send the broadcast indicating a change in the notification survey
-        //list
-        context.sendBroadcast(new Intent(ACTION_ACTIVE_SURVEY_LIST_CHANGED).setPackage(context.getPackageName()).putExtra(KEY_CAMPAIGN_URN, campaignUrn));
-    }
-
-    private static Intent getAlarmIntent(Context context, String action, int trigId) {
-        Intent i = new Intent(action);
-        i.setPackage(context.getPackageName());
-        i.setData(Uri.parse(DATA_PREFIX_ALM + trigId));
-        i.putExtra(KEY_TRIGGER_ID, trigId);
-        return i;
     }
 
     private static void cancelAllAlarms(Context context, int trigId) {
         AlarmManager alarmMan = (AlarmManager) context.getSystemService(
                 Context.ALARM_SERVICE);
 
-        Intent i = getAlarmIntent(context, ACTION_EXPIRE_ALM, trigId);
+        Intent i = new Intent(context, NotifReceiver.class).setAction(ACTION_EXPIRE_ALM);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,
                 PendingIntent.FLAG_NO_CREATE);
 
@@ -234,8 +219,21 @@ public class Notifier {
             pi.cancel();
         }
 
-        i = getAlarmIntent(context, ACTION_REPEAT_ALM, trigId);
+        i = new Intent(context, NotifReceiver.class).setAction(ACTION_REPEAT_ALM);
         pi = PendingIntent.getBroadcast(context, 0, i,
+                PendingIntent.FLAG_NO_CREATE);
+
+        if (pi != null) {
+            alarmMan.cancel(pi);
+            pi.cancel();
+        }
+    }
+
+    private static void cancelAlarm(Context context, String action) {
+        AlarmManager alarmMan = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent i = new Intent(context, NotifReceiver.class).setAction(action);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,
                 PendingIntent.FLAG_NO_CREATE);
 
         if (pi != null) {
@@ -246,17 +244,15 @@ public class Notifier {
 
     private static void setAlarm(Context context,
                                  String action,
-                                 int trigId,
                                  int mins,
                                  Bundle extras) {
 
-        Log.v(TAG, "Notifier: Setting alarm(" + trigId +
-                ", " + mins + ", " + action + ")");
+        Log.v(TAG, "Notifier: Setting alarm(" + mins + ", " + action + ")");
 
         AlarmManager alarmMan = (AlarmManager)
                 context.getSystemService(Context.ALARM_SERVICE);
 
-        Intent i = getAlarmIntent(context, action, trigId);
+        Intent i = new Intent(context, NotifReceiver.class).setAction(action);
         if (extras != null) {
             i.putExtras(extras);
         }
@@ -297,8 +293,7 @@ public class Notifier {
         Bundle repeatBundle = new Bundle();
         repeatBundle.putIntArray(KEY_REPEAT_LIST, newRepeats);
         //Set the alarm for the first repeat item and attach the remaining list
-        setAlarm(context, ACTION_REPEAT_ALM, trigId,
-                repeatDiffs[0], repeatBundle);
+        setAlarm(context, ACTION_REPEAT_ALM, repeatDiffs[0], repeatBundle);
     }
 
     /*
@@ -345,8 +340,7 @@ public class Notifier {
         }
 
         //Set an expire alarm for the remaining duration
-        setAlarm(context, ACTION_EXPIRE_ALM, trigId,
-                remDuration, null);
+        setAlarm(context, ACTION_EXPIRE_ALM, remDuration, null);
 
         //Set an alarm for the remaining repeats, if any
         List<Integer> repeats = desc.getSortedRepeats();
@@ -425,52 +419,50 @@ public class Notifier {
         }
 
         //Trigger is still active, alert the user
-        refreshNotification(context, campaign.urn, campaign.name, false);
+        refreshNotification(context, false);
         //Continue the remaining repeat reminders
         int[] repeatDiffs = intent.getIntArrayExtra(KEY_REPEAT_LIST);
         setRepeatAlarm(context, trigId, repeatDiffs);
     }
 
-    private static void handleNotifClicked(Context context, String campaignUrn) {
+    private static void handleNotifClicked(Context context, ArrayList<String> surveys) {
         //Hide the notification window when the user clicks on it
-        hideNotification(context, campaignUrn);
+        hideNotification(context);
 
         //Broadcast to Ohmage
         Intent i = new Intent(ACTION_TRIGGER_NOTIFICATION);
+        i.putExtra(EXTRA_SURVEYS, surveys);
         i.setPackage(context.getPackageName());
-        i.putExtra(KEY_CAMPAIGN_URN, campaignUrn);
         context.sendBroadcast(i);
     }
 
     /*
      * Save the visibility of the notification to preferences
      */
-    private static void saveNotifVisibility(Context context, String campaignUrn, boolean visible) {
+    private static void saveNotifVisibility(Context context, boolean visible) {
         SharedPreferences pref = context.getSharedPreferences(
-                Notifier.class.getName() + "_" + campaignUrn,
+                Notifier.class.getName(),
                 Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean(KEY_NOTIF_VISIBILITY_PREF, visible);
         editor.commit();
-
-        TrigPrefManager.registerPreferenceFile(context, campaignUrn, Notifier.class.getName());
     }
 
     /*
      * Get the current visibility of the notification
      */
-    private static boolean getNotifVisibility(Context context, String campaignUrn) {
+    private static boolean getNotifVisibility(Context context) {
         SharedPreferences pref = context.getSharedPreferences(
-                Notifier.class.getName() + "_" + campaignUrn,
+                Notifier.class.getName(),
                 Context.MODE_PRIVATE);
 
         return pref.getBoolean(KEY_NOTIF_VISIBILITY_PREF, false);
     }
 
 
-    private static void handleNotifDeleted(Context context, String campaignUrn) {
-        saveNotifVisibility(context, campaignUrn, false);
+    private static void handleNotifDeleted(Context context) {
+        saveNotifVisibility(context, false);
     }
 
     private static void handleTriggerExpired(Context context, int trigId) {
@@ -487,7 +479,7 @@ public class Notifier {
         db.close();
 
         //Quietly refresh the notification
-        Notifier.refreshNotification(context, campaign.urn, campaign.name, true);
+        Notifier.refreshNotification(context, true);
     }
 
     /*
@@ -498,15 +490,11 @@ public class Notifier {
     public static void notifyNewTrigger(Context context,
                                         int trigId,
                                         String notifDesc) {
-        TriggerDB db = new TriggerDB(context);
-        db.open();
-        TriggerDB.Campaign campaign = db.getCampaignInfo(trigId);
-        db.close();
 
         //Clear all existing alarms for this trigger if required
         cancelAllAlarms(context, trigId);
         //Update the notification with quite = false
-        refreshNotification(context, campaign.urn, campaign.name, false);
+        refreshNotification(context, false);
 
         NotifDesc desc = new NotifDesc();
         if (!desc.loadString(notifDesc)) {
@@ -516,18 +504,17 @@ public class Notifier {
         }
 
         //Set an alarm to expire this trigger notif
-        setAlarm(context, ACTION_EXPIRE_ALM, trigId,
-                desc.getDuration(), null);
+        setAlarm(context, ACTION_EXPIRE_ALM, desc.getDuration(), null);
 
         //Set an alarm for repeat reminder
         int[] repeatDiffs = getRepeatDiffs(desc.getSortedRepeats());
         setRepeatAlarm(context, trigId, repeatDiffs);
     }
 
-    public static void removeTriggerNotification(Context context, int trigId, String campaignUrn, String campaignName) {
+    public static void removeTriggerNotification(Context context, int trigId) {
         //Clear all existing alarms for this trigger if required
         cancelAllAlarms(context, trigId);
-        refreshNotification(context, campaignUrn, campaignName, true);
+        refreshNotification(context, true);
     }
 
     /* Receiver for all alarms */
@@ -537,9 +524,10 @@ public class Notifier {
         public void onReceive(Context context, Intent intent) {
 
             if (intent.getAction().equals(ACTION_NOTIF_CLICKED)) {
-                Notifier.handleNotifClicked(context, intent.getStringExtra(KEY_CAMPAIGN_URN));
+                ArrayList<String> surveys = intent.getStringArrayListExtra(EXTRA_SURVEYS);
+                Notifier.handleNotifClicked(context, surveys);
             } else if (intent.getAction().equals(ACTION_NOTIF_DELETED)) {
-                Notifier.handleNotifDeleted(context, intent.getStringExtra(KEY_CAMPAIGN_URN));
+                Notifier.handleNotifDeleted(context);
             } else if (intent.getAction().equals(ACTION_EXPIRE_ALM)) {
 
                 Notifier.handleTriggerExpired(context,

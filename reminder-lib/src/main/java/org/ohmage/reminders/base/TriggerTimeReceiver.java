@@ -23,6 +23,8 @@ import android.util.Log;
 
 import org.ohmage.reminders.notif.Notifier;
 
+import java.util.ArrayList;
+
 /*
  * Time/Time-zone change listener. Restarts the triggers and
  * refreshes the notification 
@@ -31,13 +33,16 @@ public class TriggerTimeReceiver extends BroadcastReceiver {
 
     private static final String DEBUG_TAG = "TriggerFramework";
 
-    private static void handleTimeChange(Context context, String campaignUrn, String campaignName) {
+    private static void handleTimeChange(Context context) {
         TriggerTypeMap trigMap = new TriggerTypeMap();
 
         TriggerDB db = new TriggerDB(context);
         db.open();
 
-        Cursor c = db.getAllTriggers(campaignUrn);
+        Cursor c = db.getAllTriggers();
+
+        ArrayList<String> urns = new ArrayList<String>();
+        ArrayList<String> names = new ArrayList<String>();
 
         if (c.moveToFirst()) {
             do {
@@ -65,7 +70,7 @@ public class TriggerTimeReceiver extends BroadcastReceiver {
         db.close();
 
         //Finally, quietly refresh the notification
-        Notifier.refreshNotification(context, campaignUrn, campaignName, true);
+        Notifier.refreshNotification(context, true);
     }
 
     @Override
@@ -75,12 +80,7 @@ public class TriggerTimeReceiver extends BroadcastReceiver {
 
             Log.v(DEBUG_TAG, "TriggerTimeReceiver: " + i.getAction());
 
-            TriggerDB dbHelper = new TriggerDB(context);
-            dbHelper.open();
-            for (TriggerDB.Campaign c : dbHelper.getAllCampaigns()) {
-                handleTimeChange(context, c.urn, c.name);
-            }
-            dbHelper.close();
+            handleTimeChange(context);
         }
     }
 }

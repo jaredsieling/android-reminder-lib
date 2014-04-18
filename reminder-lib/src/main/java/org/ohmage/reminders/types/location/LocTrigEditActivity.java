@@ -32,13 +32,13 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
 import org.ohmage.reminders.R;
+import org.ohmage.reminders.base.Actions;
 import org.ohmage.reminders.base.TriggerActionDesc;
 import org.ohmage.reminders.config.TrigUserConfig;
 import org.ohmage.reminders.ui.ActionSelectorView;
@@ -93,7 +93,7 @@ public class LocTrigEditActivity extends PreferenceActivity implements OnPrefere
     private static ExitListener mExitListener = null;
     private int mTrigId = 0;
     private String[] mCategories;
-    private String[] mActions;
+    private Actions mActions;
     private boolean[] mActSelected = null;
 
     @Override
@@ -106,13 +106,8 @@ public class LocTrigEditActivity extends PreferenceActivity implements OnPrefere
         mTrigDesc = new LocTrigDesc();
         mActDesc = new TriggerActionDesc();
 
-        if (getIntent().hasExtra(TriggerListActivity.EXTRA_ACTIONS)) {
-            mActions = getIntent().getStringArrayExtra(TriggerListActivity.EXTRA_ACTIONS);
-        } else {
-            Log.e(TAG, "LocTrigEditActivity: Invoked with out passing surveys");
-            finish();
-            return;
-        }
+        String[] selectParams = getIntent().getStringArrayExtra(TriggerListActivity.EXTRA_ACTIONS);
+        mActions = new Actions(this, selectParams);
 
         PreferenceScreen screen = getPreferenceScreen();
         int prefCount = screen.getPreferenceCount();
@@ -484,15 +479,15 @@ public class LocTrigEditActivity extends PreferenceActivity implements OnPrefere
     private Dialog createEditActionDialog() {
 
         if (mActSelected == null) {
-            mActSelected = new boolean[mActions.length];
+            mActSelected = new boolean[mActions.size()];
             for (int i = 0; i < mActSelected.length; i++) {
-                mActSelected[i] = mActDesc.hasSurvey(mActions[i]);
+                mActSelected[i] = mActDesc.hasSurvey(mActions.getId(i));
             }
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.trigger_select_actions).setNegativeButton(android.R.string.cancel, null)
-                .setView(new ActionSelectorView(getBaseContext(), mActions, mActSelected));
+                .setView(new ActionSelectorView(getBaseContext(), mActions.getNames(), mActSelected));
 
         /*
          * AlertDialog.Builder builder = new AlertDialog.Builder(this)
@@ -512,7 +507,7 @@ public class LocTrigEditActivity extends PreferenceActivity implements OnPrefere
 
                     for (int i = 0; i < mActSelected.length; i++) {
                         if (mActSelected[i]) {
-                            mActDesc.addSurvey(mActions[i]);
+                            mActDesc.addSurvey(mActions.getId(i));
                         }
                     }
                     dialog.dismiss();

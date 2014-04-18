@@ -564,9 +564,7 @@ public class LocTrigService extends Service
 
         TriggerDB dbHelper = new TriggerDB(this);
         dbHelper.open();
-        for (TriggerDB.Campaign c : dbHelper.getAllCampaigns()) {
-            actTrigs.addAll(lt.getAllActiveTriggerIds(this, c.urn));
-        }
+        actTrigs.addAll(lt.getAllActiveTriggerIds(this, null));
         dbHelper.close();
 
         //Start sampling if there are active surveys
@@ -1083,9 +1081,7 @@ public class LocTrigService extends Service
 
         TriggerDB dbHelper = new TriggerDB(this);
         dbHelper.open();
-        for (TriggerDB.Campaign c : dbHelper.getAllCampaigns()) {
-            trigs.addAll(locTrig.getAllActiveTriggerIds(this, c.urn));
-        }
+        trigs.addAll(locTrig.getAllActiveTriggerIds(this, null));
         dbHelper.close();
 
         for (int trig : trigs) {
@@ -1301,9 +1297,7 @@ public class LocTrigService extends Service
 
         TriggerDB dbHelper = new TriggerDB(this);
         dbHelper.open();
-        for (TriggerDB.Campaign c : dbHelper.getAllCampaigns()) {
-            trigs.addAll(locTrig.getAllActiveTriggerIds(this, c.urn));
-        }
+        trigs.addAll(locTrig.getAllActiveTriggerIds(this, null));
         dbHelper.close();
 
         for (int trigId : trigs) {

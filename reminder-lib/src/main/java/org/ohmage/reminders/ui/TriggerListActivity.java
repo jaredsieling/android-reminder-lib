@@ -23,7 +23,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -39,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.ohmage.reminders.R;
+import org.ohmage.reminders.base.Actions;
 import org.ohmage.reminders.base.AdminPincodeActivity;
 import org.ohmage.reminders.base.TriggerActionDesc;
 import org.ohmage.reminders.base.TriggerBase;
@@ -57,10 +57,22 @@ public class TriggerListActivity extends ListActivity {
 
     private static final String PREF_FILE_NAME = TriggerListActivity.class.getName();
 
+    /**
+     * To create and show reminders for a group based on an id
+     */
     public static final String EXTRA_CAMPAIGN_URN = TriggerListActivity.class.getName()
             + ".campain_urn";
+
+    /**
+     * The name of the group
+     */
     public static final String EXTRA_NAME = TriggerListActivity.class.getName()
             + ".campain_name";
+
+    /**
+     * If we want to filter the actions that can be taken when adding new reminders. This is a
+     * String[] of ids
+     */
     public static final String EXTRA_ACTIONS = TriggerListActivity.class.getName() + ".actions";
     // pass survey names through here to preselect them in the trigger creation
     // page
@@ -87,7 +99,7 @@ public class TriggerListActivity extends ListActivity {
     private Cursor mCursor;
     private TriggerDB mDb;
     private TriggerTypeMap mTrigMap;
-    private String[] mActions;
+    private Actions mActions;
     private String[] mPreselectedActions; // actions which will be preselected
     // in a new trigger window
     private String mCampaignUrn;
@@ -113,13 +125,9 @@ public class TriggerListActivity extends ListActivity {
         mTrigMap = new TriggerTypeMap();
 
         Intent i = getIntent();
-        if (i.hasExtra(EXTRA_ACTIONS)) {
-            mActions = i.getStringArrayExtra(EXTRA_ACTIONS);
-        } else {
-            Log.e(TAG, "TriggerListActivity: Invoked with out passing surveys");
-            finish();
-            return;
-        }
+
+        String[] selectParams = getIntent().getStringArrayExtra(TriggerListActivity.EXTRA_ACTIONS);
+        mActions = new Actions(this, selectParams);
 
         // gather any preselected actions that were specified
         // we'll feed these to the trigger create activity later to preselect
@@ -130,18 +138,10 @@ public class TriggerListActivity extends ListActivity {
 
         if (i.hasExtra(EXTRA_CAMPAIGN_URN)) {
             mCampaignUrn = i.getStringExtra(EXTRA_CAMPAIGN_URN);
-        } else {
-            Log.e(TAG, "TriggerListActivity: Invoked with out passing campaign urn");
-            finish();
-            return;
         }
 
         if (i.hasExtra(EXTRA_NAME)) {
             mCampaignName = i.getStringExtra(EXTRA_NAME);
-        } else {
-            Log.e(TAG, "TriggerListActivity: Invoked with out passing campaign name");
-            finish();
-            return;
         }
 
         mDb = new TriggerDB(this);
@@ -158,8 +158,7 @@ public class TriggerListActivity extends ListActivity {
             finish();
         }
 
-        TrigPrefManager.registerPreferenceFile(this, mCampaignUrn, PREF_FILE_NAME);
-        TrigPrefManager.registerPreferenceFile(this, "GLOBAL", PREF_FILE_NAME);
+        TrigPrefManager.registerPreferenceFile(this, PREF_FILE_NAME);
     }
 
     @Override
@@ -252,7 +251,7 @@ public class TriggerListActivity extends ListActivity {
         TriggerBase trig = mTrigMap.getTrigger(trigType);
 
         if (trig != null) {
-            trig.launchTriggerEditActivity(this, trigId, trigDesc, actDesc, mActions,
+            trig.launchTriggerEditActivity(this, trigId, trigDesc, actDesc, mActions.getIds(),
                     isAdminLoggedIn());
         }
     }
@@ -316,7 +315,11 @@ public class TriggerListActivity extends ListActivity {
             }
         }
 
-        mCursor = mDb.getAllTriggers(mCampaignUrn);
+        if (mCampaignUrn != null) {
+            mCursor = mDb.getAllTriggers(mCampaignUrn);
+        } else {
+            mCursor = mDb.getAllTriggers();
+        }
 
         mCursor.moveToFirst();
         startManagingCursor(mCursor);
@@ -391,15 +394,15 @@ public class TriggerListActivity extends ListActivity {
             TriggerActionDesc desc = new TriggerActionDesc();
             desc.loadString(actDesc);
 
-            mActSelected = new boolean[mActions.length];
+            mActSelected = new boolean[mActions.size()];
             for (int i = 0; i < mActSelected.length; i++) {
-                mActSelected[i] = desc.hasSurvey(mActions[i]);
+                mActSelected[i] = desc.hasSurvey(mActions.getId(i));
             }
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.trigger_select_actions).setNegativeButton(android.R.string.cancel, null)
-                .setView(new ActionSelectorView(getBaseContext(), mActions, mActSelected));
+                .setView(new ActionSelectorView(getBaseContext(), mActions.getNames(), mActSelected));
 
         /*
          * AlertDialog.Builder builder = new AlertDialog.Builder(this)
@@ -420,7 +423,7 @@ public class TriggerListActivity extends ListActivity {
 
                     for (int i = 0; i < mActSelected.length; i++) {
                         if (mActSelected[i]) {
-                            desc.addSurvey(mActions[i]);
+                            desc.addSurvey(mActions.getId(i));
                         }
                     }
                     dialog.dismiss();
@@ -440,7 +443,7 @@ public class TriggerListActivity extends ListActivity {
             @Override
             public void onClick(String trigType) {
                 mTrigMap.getTrigger(trigType).launchTriggerCreateActivity(TriggerListActivity.this,
-                        mCampaignUrn, mCampaignName, mActions, mPreselectedActions, isAdminLoggedIn());
+                        mCampaignUrn, mCampaignName, mActions.getIds(), mPreselectedActions, isAdminLoggedIn());
             }
         });
 
@@ -581,7 +584,7 @@ public class TriggerListActivity extends ListActivity {
                         mDb.updateAllNotificationDescriptions(desc);
 
                         // Update any notification if required
-                        Notifier.refreshNotification(this, mCampaignUrn, mCampaignName, true);
+                        Notifier.refreshNotification(this, true);
                     }
                 }
                 break;
@@ -630,7 +633,7 @@ public class TriggerListActivity extends ListActivity {
         mDb.updateActionDescription(trigId, desc.toString());
         mCursor.requery();
 
-        Notifier.refreshNotification(this, mCampaignUrn, mCampaignName, true);
+        Notifier.refreshNotification(this, true);
 
         if (desc.getCount() == 0 && prevDesc.getCount() != 0) {
             toggleTrigger(trigId, false);

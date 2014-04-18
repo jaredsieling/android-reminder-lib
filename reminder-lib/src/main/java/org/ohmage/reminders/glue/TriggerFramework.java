@@ -19,6 +19,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.json.JSONArray;
+import org.ohmage.reminders.base.ReminderContract.Reminders;
+import org.ohmage.reminders.base.TriggerBase;
 import org.ohmage.reminders.base.TriggerInit;
 import org.ohmage.reminders.notif.NotifSurveyAdaptor;
 import org.ohmage.reminders.notif.Notifier;
@@ -96,12 +98,14 @@ public class TriggerFramework {
      * be used to decide whether a trigger notification for that survey must
      * be displayed or not.
      */
-    public static void notifySurveyTaken(Context context, String campaignUrn, String name, String survey) {
+    public static void notifySurveyTaken(Context context, String survey) {
 
-        NotifSurveyAdaptor.recordSurveyTaken(context, campaignUrn, survey);
+        TriggerBase.updatePendingStateForSurveys(context, Reminders.NOT_PENDING, survey);
+
+        NotifSurveyAdaptor.recordSurveyTaken(context, survey);
         //Quietly refresh the notification to remove the taken
         //survey from the notification if applicable
-        Notifier.refreshNotification(context, campaignUrn, name, true);
+        Notifier.refreshNotification(context, true);
     }
 
     /*
@@ -127,7 +131,17 @@ public class TriggerFramework {
 
     public static boolean resetTriggerSettings(Context context, String campaignUrn, String campaignName) {
 
-        return TriggerInit.resetTriggersAndSettings(context, campaignUrn, campaignName);
+        return TriggerInit.resetTriggersAndSettings(context);
+    }
+
+    private static String authority;
+
+    public static void setAuthority(String authority) {
+        TriggerFramework.authority = authority;
+    }
+
+    public static String getAuthority() {
+        return authority;
     }
 }
 
