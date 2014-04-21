@@ -4,6 +4,14 @@ android-reminder-lib
 The android-reminder-lib is an Android Library (aar) which makes it easier to let users manage
 reminders and notifications in your app.
 
+DEPENDENCIES
+------------
+
+There are dependencies on the alpha branches of
+[WiFiGPSLocation](https://github.com/ohmage/wi-fi-gps-location/tree/alpha) and
+[AccelService](https://github.com/ohmage/accel-service/tree/alpha). Both should be installed to
+maven local by running `./gradlew uploadArchives` in the corresponding directories.
+
 
 CONTRIBUTE
 ----------
