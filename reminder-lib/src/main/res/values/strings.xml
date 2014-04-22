@@ -12,4 +12,5 @@
     <string name="ignore">Ignore</string>
     <string name="snooze">Snooze</string>
     <string name="notification_snoozed">Reminder snoozed for 10 minutes</string>
+    <string name="no_surveys">No surveys</string>
 </resources>

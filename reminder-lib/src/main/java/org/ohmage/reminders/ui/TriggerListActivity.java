@@ -541,6 +541,10 @@ public class TriggerListActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (R.id.menu_reminder_add == item.getItemId()) {
+            if(mActions.size() == 0) {
+                Toast.makeText(this, R.string.no_surveys, Toast.LENGTH_SHORT).show();
+                return true;
+            }
             showDialog(DIALOG_ID_ADD_NEW);
             return true;
         } else if (R.id.menu_reminder_notification_settings == item.getItemId()) {

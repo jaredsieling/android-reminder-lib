@@ -16,11 +16,9 @@ public class Actions {
     public Actions(Context context, String[] allowedActionIds) {
         String select = null;
         if (allowedActionIds != null) {
-            StringBuilder selectBuilder = null;
+            StringBuilder selectBuilder = new StringBuilder();
             for (int i = 0; i < allowedActionIds.length; i++) {
-                if (selectBuilder == null) {
-                    selectBuilder = new StringBuilder();
-                } else {
+                if (selectBuilder.length() != 0) {
                     selectBuilder.append(" OR ");
                 }
                 selectBuilder.append(ReminderContract.Reminders._ID + "=?");
@@ -30,16 +28,21 @@ public class Actions {
 
         mActions.clear();
         Cursor c = context.getContentResolver()
-                .query(ReminderContract.Reminders.buildRemindersUri(), new String[]{ReminderContract.Reminders._ID, ReminderContract.Reminders.REMINDER_NAME}, select,
-                        allowedActionIds, null);
-        mActionIds = new String[c.getCount()];
-        mActionNames = new String[c.getCount()];
-        int i = 0;
-        while (c.moveToNext()) {
-            mActionIds[i] = c.getString(0);
-            mActionNames[i] = c.getString(1);
-            mActions.put(mActionIds[i], mActionNames[i]);
-            i++;
+                .query(ReminderContract.Reminders.buildRemindersUri(),
+                        new String[]{ReminderContract.Reminders._ID,
+                                ReminderContract.Reminders.REMINDER_NAME}, select, allowedActionIds,
+                        null
+                );
+        mActionIds = new String[c == null ? 0 : c.getCount()];
+        mActionNames = new String[c == null ? 0 : c.getCount()];
+        if (c != null) {
+            int i = 0;
+            while (c.moveToNext()) {
+                mActionIds[i] = c.getString(0);
+                mActionNames[i] = c.getString(1);
+                mActions.put(mActionIds[i], mActionNames[i]);
+                i++;
+            }
         }
     }
 
@@ -48,7 +51,7 @@ public class Actions {
     }
 
     public int size() {
-        return mActionIds.length;
+        return mActions.size();
     }
 
     public String getId(int i) {

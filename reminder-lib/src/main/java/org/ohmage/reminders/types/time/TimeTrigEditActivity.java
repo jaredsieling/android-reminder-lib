@@ -471,6 +471,11 @@ public class TimeTrigEditActivity extends PreferenceActivity implements View.OnC
     }
 
     private Dialog createEditActionDialog() {
+        if(mActions.size() == 0) {
+            Toast.makeText(this, R.string.no_surveys, Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
         if (mActSelected == null) {
             mActSelected = new boolean[mActions.size()];
             for (int i = 0; i < mActSelected.length; i++) {

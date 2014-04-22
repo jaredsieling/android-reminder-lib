@@ -477,6 +477,10 @@ public class LocTrigEditActivity extends PreferenceActivity implements OnPrefere
     }
 
     private Dialog createEditActionDialog() {
+        if(mActions.size() == 0) {
+            Toast.makeText(this, R.string.no_surveys, Toast.LENGTH_SHORT).show();
+            return null;
+        }
 
         if (mActSelected == null) {
             mActSelected = new boolean[mActions.size()];
