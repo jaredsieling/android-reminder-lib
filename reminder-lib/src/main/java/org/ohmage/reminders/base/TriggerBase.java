@@ -23,13 +23,25 @@ import android.location.LocationManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 import org.ohmage.reminders.base.ReminderContract.Reminders;
 import org.ohmage.reminders.notif.NotifDesc;
 import org.ohmage.reminders.notif.NotifSurveyAdaptor;
 import org.ohmage.reminders.notif.Notifier;
+import org.ohmage.reminders.types.location.LocTrigDesc;
+import org.ohmage.reminders.types.location.LocationTrigger;
+import org.ohmage.reminders.types.time.TimeTrigDesc;
+import org.ohmage.reminders.types.time.TimeTrigger;
 
+import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.UUID;
@@ -48,6 +60,12 @@ import java.util.UUID;
 public abstract class TriggerBase {
 
     private static final String TAG = "TriggerFramework";
+
+    public String reminderId;
+    public String campaignUrn;
+    public String campaignName;
+    public TriggerActionDesc actDesc;
+    public TrigDesc trigDesc;
 
     /*
      * Function to be called by the trigger types to notify the user
@@ -353,6 +371,10 @@ public abstract class TriggerBase {
         }
     }
 
+    public void addTrigger(Context context) {
+        this.addNewTrigger(context, reminderId, campaignUrn, campaignName, trigDesc.toString(), actDesc.toString());
+    }
+
     /*
      * Update the description of an existing trigger
      */
@@ -412,6 +434,36 @@ public abstract class TriggerBase {
         return false;
     }
 
+    public static class TriggerDeserializer implements JsonDeserializer<TriggerBase> {
+
+        @Override
+        public TriggerBase deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+
+            JsonObject object = json.getAsJsonObject();
+            String type = object.get("type").getAsString();
+
+            TriggerBase trigger = new TimeTrigger();
+            if (trigger.getTriggerType().equals(type)) {
+                trigger.trigDesc = context.deserialize(object.getAsJsonObject("description"), TimeTrigDesc.class);
+            } else {
+                trigger = new LocationTrigger();
+                if (trigger.getTriggerType().equals(type)) {
+                    trigger.trigDesc = context.deserialize(object.getAsJsonObject("description"), LocTrigDesc.class);
+                } else {
+                    throw new JsonParseException("Invalid trigger type");
+                }
+            }
+
+            trigger.reminderId = object.get("reminder_id").getAsString();
+            trigger.actDesc = new TriggerActionDesc();
+            JsonArray surveys = object.get("surveys").getAsJsonArray();
+            for(int i=0;i<surveys.size();i++) {
+                trigger.actDesc.addSurvey(surveys.get(i).getAsString());
+            }
+
+            return trigger;
+        }
+    }
 
     /* Abstract functions to be implemented by all the concrete trigger types */
 

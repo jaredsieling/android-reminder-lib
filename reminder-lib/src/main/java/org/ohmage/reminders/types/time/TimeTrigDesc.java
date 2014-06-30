@@ -17,11 +17,20 @@ package org.ohmage.reminders.types.time;
 
 import android.text.format.DateUtils;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.ohmage.reminders.base.TrigDesc;
 import org.ohmage.reminders.utils.SimpleTime;
 
+import java.lang.reflect.Type;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 
@@ -34,7 +43,7 @@ import java.util.LinkedHashMap;
  * "repeat": ["Monday", "Tuesday"],
  * }
  */
-public class TimeTrigDesc {
+public class TimeTrigDesc implements TrigDesc {
     private static final int DAY_SHORT_LEN = 3;
 
     private static final String KEY_TIME = "time";
@@ -294,5 +303,67 @@ public class TimeTrigDesc {
         }
 
         return true;
+    }
+
+
+    public static class TimeTrigDescDeserializer implements JsonDeserializer<TimeTrigDesc> {
+
+        @Override
+        public TimeTrigDesc deserialize(JsonElement json, Type type,
+                                       JsonDeserializationContext context) throws JsonParseException {
+
+            JsonObject jDesc = (JsonObject) json;
+            TimeTrigDesc desc = new TimeTrigDesc();
+
+            desc.initialize(false);
+
+            String time = jDesc.get(KEY_TIME).getAsString();
+            if (time.equalsIgnoreCase(VAL_RANDOM)) {
+                desc.mIsRandomized = true;
+            } else {
+                if (!desc.mTrigTime.loadString(time)) {
+                    throw new JsonParseException("Time must be specified");
+                }
+            }
+
+            if (jDesc.has(KEY_START)) {
+
+                if (!jDesc.has(KEY_END)) {
+                    throw new JsonParseException("End time must be specified");
+                }
+
+                String start = jDesc.get(KEY_START).getAsString();
+                if (!desc.mRangeStart.loadString(start)) {
+                    throw new JsonParseException("Could not parse start time");
+                }
+
+                String end = jDesc.get(KEY_END).getAsString();
+                if (!desc.mRangeEnd.loadString(end)) {
+                    throw new JsonParseException("Could not parse end time");
+                }
+
+                desc.mIsRangeEnabled = true;
+            } else if (jDesc.has(KEY_END)) {
+                //"End" without start - error
+                throw new JsonParseException("Start time must be specified");
+            }
+
+            JsonArray repeats = jDesc.getAsJsonArray(KEY_REPEAT);
+            if (repeats.size() == 0) {
+                throw new JsonParseException("Repeats must be specified");
+            }
+
+            for (int i = 0; i < repeats.size(); i++) {
+                String day = repeats.get(i).getAsString();
+
+                if (!desc.mRepeatList.containsKey(day)) {
+                    throw new JsonParseException("Invalid repeat option");
+                }
+
+                desc.mRepeatList.put(day, true);
+            }
+
+            return desc;
+        }
     }
 }

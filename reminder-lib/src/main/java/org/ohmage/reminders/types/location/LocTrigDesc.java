@@ -17,10 +17,19 @@ package org.ohmage.reminders.types.location;
 
 import android.content.Context;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.ohmage.reminders.base.TrigDesc;
 import org.ohmage.reminders.config.LocTrigConfig;
 import org.ohmage.reminders.utils.SimpleTime;
+
+import java.lang.reflect.Type;
 
 /*
  * The class which can parse and store the JSON string of location 
@@ -38,7 +47,7 @@ import org.ohmage.reminders.utils.SimpleTime;
  *         }
  * }
  */
-public class LocTrigDesc {
+public class LocTrigDesc implements TrigDesc {
 
     private static final String KEY_LOCATION = "location";
     private static final String KEY_TIME_RANGE = "time_range";
@@ -245,5 +254,40 @@ public class LocTrigDesc {
         }
 
         return true;
+    }
+
+    public static class LocTrigDescDeserializer implements JsonDeserializer<LocTrigDesc> {
+
+        @Override
+        public LocTrigDesc deserialize(JsonElement json, Type type,
+                                       JsonDeserializationContext context) throws JsonParseException {
+
+            JsonObject jDesc = (JsonObject) json;
+            LocTrigDesc desc = new LocTrigDesc();
+
+            desc.initialize();
+
+            desc.mLocation = jDesc.get(KEY_LOCATION).getAsString();
+            desc.mMinInterval = jDesc.get(KEY_MIN_INTERVAL_REENTRY).getAsInt();
+
+            if (jDesc.has(KEY_TIME_RANGE)) {
+
+                JsonObject jRange = jDesc.get(KEY_TIME_RANGE).getAsJsonObject();
+
+                if (!desc.mStartTime.loadString(jRange.get(KEY_START).getAsString())) {
+                    throw new JsonParseException("Start time must be included");
+                }
+
+                if (!desc.mEndTime.loadString(jRange.get(KEY_END).getAsString())) {
+                    throw new JsonParseException("End time must be included");
+                }
+
+                desc.mTriggerAlways = jRange.get(KEY_TRIGGER_ALWAYS).getAsBoolean();
+
+                desc.mRangeEnabled = true;
+            }
+
+            return desc;
+        }
     }
 }

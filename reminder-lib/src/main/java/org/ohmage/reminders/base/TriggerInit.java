@@ -20,10 +20,14 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.google.gson.GsonBuilder;
+
 import org.ohmage.reminders.config.NotifConfig;
 import org.ohmage.reminders.notif.NotifDesc;
 import org.ohmage.reminders.notif.Notifier;
+import org.ohmage.reminders.types.location.LocTrigDesc;
 import org.ohmage.reminders.types.location.LocTrigMapsActivity;
+import org.ohmage.reminders.types.time.TimeTrigDesc;
 import org.ohmage.reminders.utils.TrigPrefManager;
 
 /*
@@ -166,5 +170,11 @@ public class TriggerInit {
         NotifDesc.setGlobalDesc(context, NotifConfig.defaultConfig);
 
         return true;
+    }
+
+    public static void injectDeserializers(GsonBuilder builder) {
+        builder.registerTypeAdapter(TimeTrigDesc.class, new TimeTrigDesc.TimeTrigDescDeserializer());
+        builder.registerTypeAdapter(LocTrigDesc.class, new LocTrigDesc.LocTrigDescDeserializer());
+        builder.registerTypeAdapter(TriggerBase.class, new TriggerBase.TriggerDeserializer());
     }
 }
