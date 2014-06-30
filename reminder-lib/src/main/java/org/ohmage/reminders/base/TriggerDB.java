@@ -46,13 +46,14 @@ public class TriggerDB {
     private static final String TAG = "TriggerFramework";
 
     private static final String DATABASE_NAME = "trigger_framework";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     /* Table name */
     private static final String TABLE_TRIGGERS = "triggers";
 
     /* Columns */
     public static final String KEY_ID = "_id";
+    public static final String KEY_UUID = "uuid";
     public static final String KEY_CAMPAIGN_URN = "campaign_urn";
     public static final String KEY_CAMPAIGN_NAME = "campaign_name";
     public static final String KEY_TRIG_TYPE = "trigger_type";
@@ -97,7 +98,7 @@ public class TriggerDB {
     /*
      * Add a new trigger to the db
      */
-    public long addTrigger(String campaignUrn, String campaignName, String trigType,
+    public long addTrigger(String uuid, String campaignUrn, String campaignName, String trigType,
                            String trigDescript,
                            String trigActDesc,
                            String notifDescript,
@@ -111,6 +112,7 @@ public class TriggerDB {
                 ", " + rtDescript + ")");
 
         ContentValues values = new ContentValues();
+        values.put(KEY_UUID, uuid);
         values.put(KEY_CAMPAIGN_URN, campaignUrn);
         values.put(KEY_CAMPAIGN_NAME, campaignName);
         values.put(KEY_TRIG_TYPE, trigType);
@@ -119,7 +121,7 @@ public class TriggerDB {
         values.put(KEY_NOTIF_DESCRIPT, notifDescript);
         values.put(KEY_RUNTIME_DESCRIPT, rtDescript);
 
-        return mDb.insert(TABLE_TRIGGERS, null, values);
+        return mDb.insertWithOnConflict(TABLE_TRIGGERS, null, values, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
     /*
@@ -452,6 +454,7 @@ public class TriggerDB {
             final String QUERY_CREATE_TRIGGERS_TB =
                     "create table " + TABLE_TRIGGERS + " ("
                             + KEY_ID + " integer primary key autoincrement, "
+                            + KEY_UUID + " string unique, "
                             + KEY_CAMPAIGN_URN + " text, "
                             + KEY_CAMPAIGN_NAME + " text, "
                             + KEY_TRIG_TYPE + " text not null, "

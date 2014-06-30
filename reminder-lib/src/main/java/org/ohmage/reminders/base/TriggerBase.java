@@ -32,6 +32,7 @@ import org.ohmage.reminders.notif.Notifier;
 
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.UUID;
 
 /*
  * The abstract class which must be extended by all the triggers
@@ -322,6 +323,13 @@ public abstract class TriggerBase {
      * Save a new trigger description to the database.
      */
     public void addNewTrigger(Context context, String campaignUrn, String campaignName, String trigDesc, String actDesc) {
+        addNewTrigger(context, UUID.randomUUID().toString(), campaignUrn, campaignName, trigDesc, actDesc);
+    }
+
+    /*
+     * Save a new trigger description to the database. The reminderId is used for uniqueness between the local state and the server
+     */
+    public void addNewTrigger(Context context, String uuid, String campaignUrn, String campaignName, String trigDesc, String actDesc) {
         Log.v(TAG, "TriggerBase: getTriggerLatestTimeStamp(" + trigDesc + ")");
 
         TriggerDB db = new TriggerDB(context);
@@ -329,7 +337,7 @@ public abstract class TriggerBase {
 
         //Save the trigger desc. Use default desc for notification, action
         // and run time
-        int trigId = (int) db.addTrigger(campaignUrn, campaignName, this.getTriggerType(), trigDesc,
+        int trigId = (int) db.addTrigger(uuid, campaignUrn, campaignName, this.getTriggerType(), trigDesc,
                 actDesc,
                 NotifDesc.getDefaultDesc(context),
                 TriggerRunTimeDesc.getDefaultDesc());
