@@ -113,6 +113,7 @@ public class TriggerListActivity extends ListActivity {
      * end once the user leaves the activity
      */
     private boolean mAdminMode;
+    private String[] mSelectParams;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -126,8 +127,8 @@ public class TriggerListActivity extends ListActivity {
 
         Intent i = getIntent();
 
-        String[] selectParams = getIntent().getStringArrayExtra(TriggerListActivity.EXTRA_ACTIONS);
-        mActions = new Actions(this, selectParams);
+        mSelectParams = getIntent().getStringArrayExtra(TriggerListActivity.EXTRA_ACTIONS);
+        mActions = new Actions(this, mSelectParams);
 
         // gather any preselected actions that were specified
         // we'll feed these to the trigger create activity later to preselect
@@ -251,7 +252,7 @@ public class TriggerListActivity extends ListActivity {
         TriggerBase trig = mTrigMap.getTrigger(trigType);
 
         if (trig != null) {
-            trig.launchTriggerEditActivity(this, trigId, trigDesc, actDesc, mActions.getIds(),
+            trig.launchTriggerEditActivity(this, trigId, trigDesc, actDesc, mSelectParams,
                     isAdminLoggedIn());
         }
     }
@@ -443,7 +444,7 @@ public class TriggerListActivity extends ListActivity {
             @Override
             public void onClick(String trigType) {
                 mTrigMap.getTrigger(trigType).launchTriggerCreateActivity(TriggerListActivity.this,
-                        mCampaignUrn, mCampaignName, mActions.getIds(), mPreselectedActions, isAdminLoggedIn());
+                        mCampaignUrn, mCampaignName, mSelectParams, mPreselectedActions, isAdminLoggedIn());
             }
         });
 
