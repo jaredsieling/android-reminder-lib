@@ -412,11 +412,17 @@ public class LocTrigEditActivity extends PreferenceActivity implements OnPrefere
     private void updateActionsPrefStatus() {
         Preference actionsPref = getPreferenceScreen().findPreference(PREF_KEY_ACTIONS);
         if (mActDesc.getSurveys().length > 0) {
-            actionsPref.setSummary(stringArrayToString(mActDesc.getSurveys()));
+            StringBuilder actions = new StringBuilder();
+            for (String id : mActDesc.getSurveys()) {
+                if (actions.length() != 0) {
+                    actions.append(", ");
+                }
+                actions.append(mActions.getName(id));
+            }
+            actionsPref.setSummary(actions.toString());
         } else {
-            actionsPref.setSummary("None");
+            actionsPref.setSummary(R.string.trigger_no_actions);
         }
-
     }
 
     private String stringArrayToString(String[] strings) {
