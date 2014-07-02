@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Example/Example.iml" filepath="$PROJECT_DIR$/Example/Example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Example/Example.iml" filepath="$PROJECT_DIR$/Example/Example.iml" />
       <module fileurl="file://$PROJECT_DIR$/ReminderLib.iml" filepath="$PROJECT_DIR$/ReminderLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reminder-lib.iml" filepath="$PROJECT_DIR$/reminder-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/reminder-lib/reminder-lib.iml" filepath="$PROJECT_DIR$/reminder-lib/reminder-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reminder-lib/reminder-lib-reminder-lib.iml" filepath="$PROJECT_DIR$/reminder-lib/reminder-lib-reminder-lib.iml" />
     </modules>
   </component>
 </project>
